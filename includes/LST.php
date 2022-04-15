@@ -54,6 +54,10 @@ class LST {
 
 			return false;
 		} else {
+			if ( !isset( $parser->mTemplatePath ) ) {
+				$parser->mTemplatePath = [];
+			}
+
 			$parser->mTemplatePath[$part1] = 1;
 
 			return true;
