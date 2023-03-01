@@ -2207,11 +2207,12 @@ class Query {
 			] );
 
 			$linksMigration = MediaWikiServices::getInstance()->getLinksMigration();
-			list( $nsField, $titleField ) = $linksMigration->getTitleFields( 'templatelinks' );
+			[ $nsField, $titleField ] = $linksMigration->getTitleFields( 'templatelinks' );
 
 			$this->addSelect( [ 'tpl_sel_title' => 'tplsrc.page_title', 'tpl_sel_ns' => 'tplsrc.page_namespace' ] );
 			$where = $this->tableNames['page'] . '.page_namespace = lt.' . $nsField . ' AND ' .
-					 $this->tableNames['page'] . '.page_title = lt.' . $titleField . ' AND tplsrc.page_id = tpl.tl_from AND ';
+					 $this->tableNames['page'] . '.page_title = lt.' . $titleField .
+					 ' AND tplsrc.page_id = tpl.tl_from AND lt.lt_id = tpl.tl_target_id AND ';
 			$ors = [];
 
 			foreach ( $option as $linkGroup ) {
@@ -2241,7 +2242,7 @@ class Query {
 		$ors = [];
 
 		$linksMigration = MediaWikiServices::getInstance()->getLinksMigration();
-		list( $nsField, $titleField ) = $linksMigration->getTitleFields( 'templatelinks' );
+		[ $nsField, $titleField ] = $linksMigration->getTitleFields( 'templatelinks' );
 
 		foreach ( $option as $linkGroup ) {
 			foreach ( $linkGroup as $link ) {
@@ -2272,7 +2273,7 @@ class Query {
 			$ors = [];
 
 			$linksMigration = MediaWikiServices::getInstance()->getLinksMigration();
-			list( $nsField, $titleField ) = $linksMigration->getTitleFields( 'templatelinks' );
+			[ $nsField, $titleField ] = $linksMigration->getTitleFields( 'templatelinks' );
 
 			foreach ( $option as $linkGroup ) {
 				foreach ( $linkGroup as $link ) {
