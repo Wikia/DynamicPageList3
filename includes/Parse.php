@@ -988,11 +988,11 @@ class Parse {
 			}
 
 			if ( $parserOutput && isset( $eliminate['categories'] ) && $eliminate['categories'] ) {
-				Hooks::$createdLinks[2] = $parserOutput->mCategories;
+				Hooks::$createdLinks[2] = $parserOutput->getCategories();
 			}
 
 			if ( $parserOutput && isset( $eliminate['images'] ) && $eliminate['images'] ) {
-				Hooks::$createdLinks[3] = $parserOutput->mImages;
+				Hooks::$createdLinks[3] = $parserOutput->getImages();
 			}
 		}
 	}

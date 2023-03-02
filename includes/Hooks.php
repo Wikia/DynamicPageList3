@@ -214,30 +214,32 @@ class Hooks {
 
 		// we can remove the templates by save/restore
 		if ( $reset['templates'] ?? false ) {
-			$saveTemplates = $parser->getOutput()->mTemplates;
+			$saveTemplates = $parser->getOutput()->getTemplates();
 		}
 
 		// we can remove the categories by save/restore
 		if ( $reset['categories'] ?? false ) {
-			$saveCategories = $parser->getOutput()->mCategories;
+			$saveCategories = $parser->getOutput()->getCategories();
 		}
 
 		// we can remove the images by save/restore
 		if ( $reset['images'] ?? false ) {
-			$saveImages = $parser->getOutput()->mImages;
+			$saveImages = $parser->getOutput()->getImages();
 		}
 
 		$parsedDPL = $parser->recursiveTagParse( $text );
 		if ( $reset['templates'] ?? false ) {
-			$parser->getOutput()->mTemplates = $saveTemplates ?? [];
+			$outputTemplates = $parser->getOutput()->getTemplates();
+			$outputTemplates = $saveTemplates ?? [];
 		}
 
 		if ( $reset['categories'] ?? false ) {
-			$parser->getOutput()->mCategories = $saveCategories ?? [];
+			$parser->getOutput()->setCategories( $saveCategories ?? [] );
 		}
 
 		if ( $reset['images'] ?? false ) {
-			$parser->getOutput()->mImages = $saveImages ?? [];
+			$outputImages = $parser->getOutput()->getImages();
+			$outputImages = $saveImages ?? [];
 		}
 
 		return $parsedDPL;
@@ -556,26 +558,29 @@ class Hooks {
 		if ( !self::$createdLinks['resetdone'] ) {
 			self::$createdLinks['resetdone'] = true;
 
-			foreach ( $parser->getOutput()->mCategories as $key => $val ) {
+			foreach ( $parser->getOutput()->getCategories() as $key => $val ) {
 				if ( array_key_exists( $key, self::$fixedCategories ) ) {
 					self::$fixedCategories[$key] = $val;
 				}
 			}
 
 			if ( self::$createdLinks['resetLinks'] ) {
-				$parser->getOutput()->mLinks = [];
+				$outputLinks = $parser->getOutput()->getLinks();
+				$outputLinks = [];
 			}
 
 			if ( self::$createdLinks['resetCategories'] ) {
-				$parser->getOutput()->mCategories = self::$fixedCategories;
+				$parser->getOutput()->setCategories( self::$fixedCategories );
 			}
 
 			if ( self::$createdLinks['resetTemplates'] ) {
-				$parser->getOutput()->mTemplates = [];
+				$outputTemplates = $parser->getOutput()->getTemplates();
+				$outputTemplates = [];
 			}
 
 			if ( self::$createdLinks['resetImages'] ) {
-				$parser->getOutput()->mImages = [];
+				$outputImages = $parser->getOutput()->getImages();
+				$outputImages = [];
 			}
 
 			self::$fixedCategories = [];
@@ -594,35 +599,38 @@ class Hooks {
 					if ( !array_key_exists( $nsp, self::$createdLinks[0] ) ) {
 						continue;
 					}
+					$outputLinks = $parser->getOutput()->getLinks();
 
-					$parser->getOutput()->mLinks[$nsp] = array_diff_assoc( $parser->getOutput()->mLinks[$nsp], self::$createdLinks[0][$nsp] );
+					$outputLinks[$nsp] = array_diff_assoc( $outputLinks[$nsp], self::$createdLinks[0][$nsp] );
 
-					if ( count( $parser->getOutput()->mLinks[$nsp] ) == 0 ) {
-						unset( $parser->getOutput()->mLinks[$nsp] );
+					if ( count( $outputLinks[$nsp] ) == 0 ) {
+						unset( $outputLinks[$nsp] );
 					}
 				}
 			}
+			$outputTemplates = $parser->getOutput()->getTemplates();
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 1, self::$createdLinks ) ) {
-				foreach ( $parser->getOutput()->mTemplates as $nsp => $tpl ) {
+				foreach ( $outputTemplates as $nsp => $tpl ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[1] ) ) {
 						continue;
 					}
 
-					$parser->getOutput()->mTemplates[$nsp] = array_diff_assoc( $parser->getOutput()->mTemplates[$nsp], self::$createdLinks[1][$nsp] );
+					$outputTemplates[$nsp] = array_diff_assoc( $outputTemplates[$nsp], self::$createdLinks[1][$nsp] );
 
-					if ( count( $parser->getOutput()->mTemplates[$nsp] ) == 0 ) {
-						unset( $parser->getOutput()->mTemplates[$nsp] );
+					if ( count( $outputTemplates[$nsp] ) == 0 ) {
+						unset( $outputTemplates[$nsp] );
 					}
 				}
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 2, self::$createdLinks ) ) {
-				$parser->getOutput()->mCategories = array_diff_assoc( $parser->getOutput()->mCategories, self::$createdLinks[2] );
+				$parser->getOutput()->setCategories( array_diff_assoc( $parser->getOutput()->getCategories(), self::$createdLinks[2] ) );
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 3, self::$createdLinks ) ) {
-				$parser->getOutput()->mImages = array_diff_assoc( $parser->getOutput()->mImages, self::$createdLinks[3] );
+				$outputImages = $parser->getOutput()->getImages();
+				$outputImages = array_diff_assoc( $outputImages, self::$createdLinks[3] );
 			}
 		}
 	}
