@@ -2202,17 +2202,23 @@ class Query {
 		} else {
 			$this->addTables( [
 				'linktarget' => 'lt',
-				'page' => 'tplsrc',
 				'templatelinks' => 'tpl',
 			] );
 
 			$linksMigration = MediaWikiServices::getInstance()->getLinksMigration();
 			[ $nsField, $titleField ] = $linksMigration->getTitleFields( 'templatelinks' );
 
-			$this->addSelect( [ 'tpl_sel_title' => 'tplsrc.page_title', 'tpl_sel_ns' => 'tplsrc.page_namespace' ] );
-			$where = $this->tableNames['page'] . '.page_namespace = lt.' . $nsField . ' AND ' .
-					 $this->tableNames['page'] . '.page_title = lt.' . $titleField .
-					 ' AND tplsrc.page_id = tpl.tl_from AND lt.lt_id = tpl.tl_target_id AND ';
+			$this->addSelect( [
+				'tpl_sel_title' => "{$this->tableNames['page']}.page_title",
+				'tpl_sel_ns' => "{$this->tableNames['page']}.page_namespace"
+			] );
+
+			$this->addJoin(
+				'lt',
+				[ 'JOIN', [ "page_title = $titleField", "page_namespace = $nsField" ] ]
+			);
+			$this->addJoin( 'tpl', [ 'JOIN', 'lt_id = tl_target_id', ]
+			);
 			$ors = [];
 
 			foreach ( $option as $linkGroup ) {
@@ -2221,9 +2227,8 @@ class Query {
 				}
 			}
 
-			$where .= '(' . implode( ' OR ', $ors ) . ')';
+			$where = '(' . implode( ' OR ', $ors ) . ')';
 		}
-
 		$this->addWhere( $where );
 	}
 
