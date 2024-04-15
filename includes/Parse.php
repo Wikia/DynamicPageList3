@@ -199,6 +199,7 @@ class Parse {
 		/*********/
 		/* Query */
 		/*********/
+		$dplQueryStartTime = microtime( true );
 		try {
 			$query = new Query( $this->parameters );
 
@@ -258,6 +259,7 @@ class Parse {
 		/*******************/
 		/* Generate Output */
 		/*******************/
+		$dplFormatStartTime = microtime( true );
 		$lister = Lister::newFromStyle( $this->parameters->getParameter( 'mode' ), $this->parameters, $parser );
 		$heading = Heading::newFromStyle( $this->parameters->getParameter( 'headingmode' ), $this->parameters );
 		if ( $heading !== null ) {
@@ -281,6 +283,9 @@ class Parse {
 
 		// This could be different than TOTALPAGES. PAGES represents the total results within the constraints of SQL LIMIT.
 		$this->setVariable( 'PAGES', $lister->getRowCount() );
+
+		// Log long DPL executions
+		$this->logLongExecutions( $dplStartTime, $dplQueryStartTime, $dplFormatStartTime );
 
 		// Replace %DPLTIME% by execution time and timestamp in header and footer
 		$nowTimeStamp = date( 'Y/m/d H:i:s' );
@@ -336,6 +341,32 @@ class Parse {
 		$this->triggerEndResets( $finalOutput, $reset, $eliminate, $isParserTag, $parser );
 
 		return $finalOutput;
+	}
+
+	private function logLongExecutions( float $startTime, float $queryStartTime, float $formatStartTime ): void {
+		// number of seconds
+		$loggingThreshold = 10;
+		$totalTime = microtime( true ) - $startTime;
+		$queryTime = $formatStartTime - $queryStartTime;
+		$formatTime = microtime( true ) - $formatStartTime;
+		$reason = [];
+		if ( $queryTime > $loggingThreshold ) {
+			$reason[] = 'dpl_query_time';
+		}
+		if ( $formatTime > $loggingThreshold ) {
+			$reason[] = 'dpl_format_time';
+		}
+		if ( $reason ) {
+			\MediaWiki\Logger\LoggerFactory::getInstance( 'dpl' )->warning(
+				sprintf( 'DPL long execution: %.3f - query: %.3f format: %.3f',
+					$totalTime, $queryTime, $formatTime ),
+				[ 'params' => [
+					'dpl_reason' => implode( ' ', $reason ),
+					'dpl_query_time' => $queryTime,
+					'dpl_format_time' => $formatTime,
+					'dpl_total_time' => $totalTime,
+				] ] );
+		}
 	}
 
 	/**
