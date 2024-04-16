@@ -285,7 +285,7 @@ class Parse {
 		$this->setVariable( 'PAGES', $lister->getRowCount() );
 
 		// Log long DPL executions
-		$this->logLongExecutions( $dplStartTime, $dplQueryStartTime, $dplFormatStartTime );
+		$this->logSlowExecutions( $dplStartTime, $dplQueryStartTime, $dplFormatStartTime );
 
 		// Replace %DPLTIME% by execution time and timestamp in header and footer
 		$nowTimeStamp = date( 'Y/m/d H:i:s' );
@@ -343,7 +343,7 @@ class Parse {
 		return $finalOutput;
 	}
 
-	private function logLongExecutions( float $startTime, float $queryStartTime, float $formatStartTime ): void {
+	private function logSlowExecutions( float $startTime, float $queryStartTime, float $formatStartTime ): void {
 		// number of seconds
 		$loggingThreshold = 10;
 		$totalTime = microtime( true ) - $startTime;
