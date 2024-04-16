@@ -358,7 +358,7 @@ class Parse {
 		}
 		if ( $reason ) {
 			\MediaWiki\Logger\LoggerFactory::getInstance( 'dpl' )->warning(
-				sprintf( 'DPL long execution: %.3f - query: %.3f format: %.3f',
+				sprintf( 'DPL slow execution: %.3f - query: %.3f format: %.3f',
 					$totalTime, $queryTime, $formatTime ),
 				[ 'params' => [
 					'dpl_reason' => implode( ' ', $reason ),
