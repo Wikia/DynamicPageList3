@@ -705,7 +705,7 @@ class LST {
 				}
 			} else {
 				// put a red link into the output
-				$output[0] = $parser->preprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
+				$output[0] = $parser->recursivePreprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}' );
 			}
 
 			unset( $title );
@@ -754,7 +754,7 @@ class LST {
 							}
 
 							$argChain .= '|%DATE%=' . $date . '|%USER%=' . $user . '|%ARGS%=' . str_replace( '|', '§', preg_replace( '/[}]+/', '}', preg_replace( '/[{]+/', '{', substr( $invocation, strlen( $template2 ) + 2 ) ) ) ) . '}}';
-							$output[++$n] = $parser->preprocess( $argChain, $parser->getPage(), $parser->getOptions() );
+							$output[++$n] = $parser->recursivePreprocess( $argChain );
 						}
 						break;
 					}
