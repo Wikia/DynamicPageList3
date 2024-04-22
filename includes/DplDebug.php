@@ -54,7 +54,7 @@ class DplDebug {
 		if ( !$requestName ) {
 			$safeTitle = self::sanitize( \RequestContext::getMain()->getTitle()->getPrefixedText() );
 			$requestName = sprintf( "%s-%s",
-				\wfTimestamp( TS_DB, $_SERVER['REQUEST_TIME_FLOAT'] ),
+				\wfTimestamp( TS_MW, $_SERVER['REQUEST_TIME_FLOAT'] ),
 				$safeTitle );
 		}
 

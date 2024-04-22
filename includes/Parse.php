@@ -102,7 +102,7 @@ class Parse {
 	public function parse( $input, Parser $parser, &$reset, &$eliminate, $isParserTag = false ) {
 		$dplStartTime = microtime( true );
 
-		DplDebug::nextRun();
+		DplDebug::newRun();
 
 		// Reset headings when being ran more than once in the same page load.
 		Article::resetHeadings();
