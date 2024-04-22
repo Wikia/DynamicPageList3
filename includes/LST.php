@@ -706,8 +706,10 @@ class LST {
 			} else {
 				// put a red link into the output
 				if ( !DplDebug::useRecursivePreprocess() ) {
+					DplDebug::record( 'link-recursive' );
 					$output[0] = $parser->preprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
 				} else {
+					DplDebug::record( 'link-standard' );
 					$output[0] = $parser->recursivePreprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}' );
 				}
 			}
@@ -759,8 +761,10 @@ class LST {
 
 							$argChain .= '|%DATE%=' . $date . '|%USER%=' . $user . '|%ARGS%=' . str_replace( '|', '§', preg_replace( '/[}]+/', '}', preg_replace( '/[{]+/', '{', substr( $invocation, strlen( $template2 ) + 2 ) ) ) ) . '}}';
 							if ( !DplDebug::useRecursivePreprocess() ) {
+								DplDebug::record( 'template-recursive' );
 								$output[++$n] = $parser->preprocess( $argChain, $parser->getPage(), $parser->getOptions() );
 							} else {
+								DplDebug::record( 'template-standard' );
 								$output[++$n] = $parser->recursivePreprocess( $argChain );
 							}
 						}

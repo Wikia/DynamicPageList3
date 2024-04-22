@@ -76,16 +76,28 @@ class DplDebug {
 	}
 
 	public static function sanitize( string $s ): string {
-		$s = preg_replace( '/' . preg_quote( '/\\|', '/' ) . '/', '_', $s );
+		$s = preg_replace( '/' . preg_quote( '/\\| ', '/' ) . '/', '_', $s );
 		$s = preg_replace( '/[{}]/', '', $s );
 
 		return $s;
 	}
 
-	private static int $currentRun = 1;
+	private static int $currentRun = 0;
+	private static array $runStats = [];
 
-	public static function nextRun(): void {
+	public static function newRun(): void {
 		self::$currentRun++;
+		self::$runStats = [];
+	}
+
+	public static function endRun(): void {
+		if ( self::$runStats ) {
+			self::save( 'stats', self::$runStats );
+		}
+	}
+
+	public static function record( string $name ): void {
+		self::$runStats[$name] = ( self::$runStats[$name] ?? 0 ) + 1;
 	}
 
 	public static function save( string $name, mixed $data ): void {
