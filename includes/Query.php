@@ -366,6 +366,10 @@ class Query {
 		$queryCacheTime = Config::getSetting( 'queryCacheTime' );
 		$maxQueryTime = Config::getSetting( 'maxQueryTime' );
 
+		if ( DplDebug::forceQueryExecution() ) {
+			$queryCacheTime = 0;
+		}
+
 		if ( $maxQueryTime ) {
 			$options['MAX_EXECUTION_TIME'] = $maxQueryTime;
 		}

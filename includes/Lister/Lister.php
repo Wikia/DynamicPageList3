@@ -589,7 +589,7 @@ class Lister {
 	 * @param int $count
 	 * @return string
 	 */
-	public function formatList( $articles, $start, $count ) {
+	public function formatlist( $articles, $start, $count ) {
 		$filteredCount = 0;
 		$items = [];
 

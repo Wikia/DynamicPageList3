@@ -9,18 +9,28 @@ class DplDebug {
 		if ( $config === null ) {
 			$config = [
 				'file-debug' => false,
+				'force-query-exec' => false,
 				'recursive-preprocess' => true,
 			];
-			if ( \RequestContext::getMain()->getRequest()->getBool( 'dplfiledebug' ) ) {
-				$config['file-debug'] = true;
-			}
+
 			$dplTest = \RequestContext::getMain()->getRequest()->getText( 'dpltest' );
 			if ( $dplTest === 'standard' ) {
-				$config['file-debug'] = true;
-				$config['recursive-preprocess'] = false;
+				$config = array_merge( $config, [
+					'file-debug' => true,
+					'force-query-exec' => true,
+					'recursive-preprocess' => false,
+				] );
 			} elseif ( $dplTest === 'speedup' ) {
-				$config['file-debug'] = true;
-				$config['recursive-preprocess'] = true;
+				$config = array_merge( $config, [
+					'file-debug' => true,
+					'force-query-exec' => true,
+					'recursive-preprocess' => true,
+				] );
+			}
+
+			$dplFileDebug = \RequestContext::getMain()->getRequest()->getBool( 'dplfiledebug' );
+			if ( $dplFileDebug !== null ) {
+				$config['file-debug'] = $dplFileDebug;
 			}
 		}
 
@@ -33,6 +43,10 @@ class DplDebug {
 
 	public static function isFileDebugEnabled(): bool {
 		return self::getConfig()['recursive-preprocess'];
+	}
+
+	public static function forceQueryExecution(): bool {
+		return self::getConfig()['force-query-exec'];
 	}
 
 	public static function getRequestName(): string {
@@ -68,6 +82,12 @@ class DplDebug {
 		return $s;
 	}
 
+	private static int $currentRun = 1;
+
+	public static function nextRun(): void {
+		self::$currentRun++;
+	}
+
 	public static function save( string $name, mixed $data ): void {
 		if ( !self::isFileDebugEnabled() ) {
 			return;
@@ -77,7 +97,8 @@ class DplDebug {
 			$data = json_encode( $data, JSON_PRETTY_PRINT );
 		}
 
-		$outname = self::getOutputDir() . '/' . $name;
+		$runStr = 'run-' . str_pad( (string)self::$currentRun, 4, '0', STR_PAD_LEFT );
+		$outname = self::getOutputDir() . '/' . $runStr . '-' . $name;
 		file_put_contents( $outname, $data );
 	}
 }

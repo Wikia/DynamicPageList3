@@ -3,6 +3,7 @@
 namespace MediaWiki\Extension\DynamicPageList3\Lister;
 
 use MediaWiki\Extension\DynamicPageList3\Article;
+use MediaWiki\Extension\DynamicPageList3\DplDebug;
 use MediaWiki\Extension\DynamicPageList3\Parameters;
 use Parser;
 
@@ -72,6 +73,11 @@ class UserFormatList extends Lister {
 				$pageText = $this->transcludePage( $article, $filteredCount );
 			} else {
 				$filteredCount++;
+			}
+
+			$n = str_pad( (string)$i, strlen( (string)( $start + $count ) ), '0', STR_PAD_LEFT );
+			if ( $pageText ) {
+				DplDebug::save( 'output-list-item-' . $n, $pageText );
 			}
 
 			$this->rowCount = $filteredCount;
