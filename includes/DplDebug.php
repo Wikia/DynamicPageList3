@@ -76,7 +76,7 @@ class DplDebug {
 	}
 
 	public static function sanitize( string $s ): string {
-		$s = preg_replace( '/' . preg_quote( '/\\| ', '/' ) . '/', '_', $s );
+		$s = preg_replace( '/[' . preg_quote( '/\\| ', '/' ) . ']/', '_', $s );
 		$s = preg_replace( '/[{}]/', '', $s );
 
 		return $s;
