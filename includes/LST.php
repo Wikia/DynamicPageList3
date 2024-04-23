@@ -804,7 +804,7 @@ class LST {
 				}
 			} else {
 				// put a red link into the output
-				$output[0] = $parser->preprocess(
+				$output[0] = self::callParserPreprocess( $parser,
 					'{{' . $defaultTemplate . '|%PAGE%=' .
 					$page . '|%TITLE%=' . $title->getText() .
 					'|%DATE%=' . $date . '|%USER%=' . $user . '}}',
@@ -875,7 +875,7 @@ class LST {
 										)
 									)
 								) . '}}';
-							$output[++$n] = $parser->preprocess( $argChain, $parser->getPage(), $parser->getOptions() );
+							$output[++$n] = self::callParserPreprocess( $parser, $argChain, $parser->getPage(), $parser->getOptions() );
 						}
 						break;
 					}
@@ -1035,5 +1035,26 @@ class LST {
 	public static function spaceOrUnderscore( $pattern ) {
 		// returns a pettern that matches underscores as well as spaces
 		return str_replace( ' ', '[ _]', $pattern );
+	}
+
+	public static $useRecursivePreprocess = true;
+
+	/**
+	 * @param Parser $parser
+	 * @param string $text
+	 * @param ?\MediaWiki\Page\PageReference $page
+	 * @param \ParserOptions $options
+	 * @return string
+	 */
+	protected static function callParserPreprocess( Parser $parser, $text, $page, $options ): string {
+		if ( self::$useRecursivePreprocess ) {
+			$outputType = $parser->getOutputType();
+			$parser->setOutputType( OT_PREPROCESS );
+			$text = $parser->recursivePreprocess( $text );
+			$parser->setOutputType( $outputType );
+			return $text;
+		} else {
+			return $parser->preprocess( $text, $page, $options );
+		}
 	}
 }
