@@ -344,6 +344,8 @@ class Parse {
 
 		$this->triggerEndResets( $finalOutput, $reset, $eliminate, $isParserTag, $parser );
 
+		DplDebug::endRun();
+
 		return $finalOutput;
 	}
 
