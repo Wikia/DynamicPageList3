@@ -705,13 +705,7 @@ class LST {
 				}
 			} else {
 				// put a red link into the output
-				if ( !DplDebug::useRecursivePreprocess() ) {
-					DplDebug::record( 'link-recursive' );
-					$output[0] = $parser->preprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
-				} else {
-					DplDebug::record( 'link-standard' );
-					$output[0] = $parser->recursivePreprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}' );
-				}
+				$output[0] = self::callParserPreprocess( $parser, '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' .	$title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
 			}
 
 			unset( $title );
@@ -760,13 +754,7 @@ class LST {
 							}
 
 							$argChain .= '|%DATE%=' . $date . '|%USER%=' . $user . '|%ARGS%=' . str_replace( '|', '§', preg_replace( '/[}]+/', '}', preg_replace( '/[{]+/', '{', substr( $invocation, strlen( $template2 ) + 2 ) ) ) ) . '}}';
-							if ( !DplDebug::useRecursivePreprocess() ) {
-								DplDebug::record( 'template-recursive' );
-								$output[++$n] = $parser->preprocess( $argChain, $parser->getPage(), $parser->getOptions() );
-							} else {
-								DplDebug::record( 'template-standard' );
-								$output[++$n] = $parser->recursivePreprocess( $argChain );
-							}
+							$output[++$n] = self::callParserPreprocess( $parser, $argChain, $parser->getPage(), $parser->getOptions() );
 						}
 						break;
 					}
@@ -899,5 +887,30 @@ class LST {
 	public static function spaceOrUnderscore( $pattern ) {
 		// returns a pettern that matches underscores as well as spaces
 		return str_replace( ' ', '[ _]', $pattern );
+	}
+
+	public static $useRecursivePreprocess = true;
+
+	/**
+	 * @param Parser $parser
+	 * @param string $text
+	 * @param ?\MediaWiki\Page\PageReference $page
+	 * @param \ParserOptions $options
+	 * @return string
+	 */
+	protected static function callParserPreprocess( Parser $parser, $text, $page, $options ): string {
+		self::$useRecursivePreprocess = DplDebug::useRecursivePreprocess();
+		if ( self::$useRecursivePreprocess ) {
+			DplDebug::record( 'preprocess-speedup' );
+			$outputType = $parser->getOutputType();
+			$parser->setOutputType( OT_PREPROCESS );
+			$text = $parser->recursivePreprocess( $text );
+			$parser->setOutputType( $outputType );
+		} else {
+			DplDebug::record( 'preprocess-standard' );
+			$text = $parser->preprocess( $text, $page, $options );
+		}
+
+		return $text;
 	}
 }
