@@ -904,6 +904,8 @@ class LST {
 	 * Using Parser::recursivePreprocess() prevents the cache clear, and thus repetitive calls reuse the
 	 * previously generated template DOM which brings a decent performance improvement when called multiple times.
 	 *
+	 * @see https://fandom.atlassian.net/browse/PLATFORM-8725
+	 *
 	 * @param Parser $parser
 	 * @param string $text
 	 * @param ?\MediaWiki\Page\PageReference $page
