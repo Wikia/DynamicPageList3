@@ -705,7 +705,7 @@ class LST {
 				}
 			} else {
 				// put a red link into the output
-				$output[0] = $parser->preprocess( '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
+				$output[0] = self::callParserPreprocess( $parser, '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' .	$title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
 			}
 
 			unset( $title );
@@ -754,7 +754,7 @@ class LST {
 							}
 
 							$argChain .= '|%DATE%=' . $date . '|%USER%=' . $user . '|%ARGS%=' . str_replace( '|', '§', preg_replace( '/[}]+/', '}', preg_replace( '/[{]+/', '{', substr( $invocation, strlen( $template2 ) + 2 ) ) ) ) . '}}';
-							$output[++$n] = $parser->preprocess( $argChain, $parser->getPage(), $parser->getOptions() );
+							$output[++$n] = self::callParserPreprocess( $parser, $argChain, $parser->getPage(), $parser->getOptions() );
 						}
 						break;
 					}
@@ -887,5 +887,40 @@ class LST {
 	public static function spaceOrUnderscore( $pattern ) {
 		// returns a pettern that matches underscores as well as spaces
 		return str_replace( ' ', '[ _]', $pattern );
+	}
+
+	/**
+	 * Preprocess given text according to the globally-configured method
+	 *
+	 * The default method uses Parser::preprocess() which does the job, but clears the internal cache every time.
+	 * The improved method uses Parser::recursivePreprocess() that saves a decent amount of processing time
+	 * by preserving the internal cache leveraging the repetitive call pattern.
+	 *
+	 * Parser::preprocess() was mainly called from LST::includeTemplate() for the same template(s) with different
+	 * set of arguments for each article found. In the original implementation using Parser::preprocess(),
+	 * the internal cache is cleared at each call and parsing the same template text into template DOM is repeated
+	 * multiple times.
+	 *
+	 * Using Parser::recursivePreprocess() prevents the cache clear, and thus repetitive calls reuse the
+	 * previously generated template DOM which brings a decent performance improvement when called multiple times.
+	 *
+	 * @see https://fandom.atlassian.net/browse/PLATFORM-8725
+	 *
+	 * @param Parser $parser
+	 * @param string $text
+	 * @param ?\MediaWiki\Page\PageReference $page
+	 * @param \ParserOptions $options
+	 * @return string
+	 */
+	protected static function callParserPreprocess( Parser $parser, $text, $page, $options ): string {
+		global $wgDplUseRecursivePreprocess;
+		if ( $wgDplUseRecursivePreprocess ) {
+			$parser->setOutputType( OT_PREPROCESS );
+			$text = $parser->recursivePreprocess( $text );
+
+			return $text;
+		} else {
+			return $parser->preprocess( $text, $page, $options );
+		}
 	}
 }
