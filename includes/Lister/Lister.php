@@ -237,10 +237,8 @@ class Lister {
 
 	/**
 	 * Parameters
-	 *
-	 * @var Parameters
 	 */
-	protected $parameters;
+	protected Parameters $parameters;
 
 	/**
 	 * Parser
@@ -279,13 +277,8 @@ class Lister {
 
 	/**
 	 * Get a new List subclass based on user selection.
-	 *
-	 * @param string $style
-	 * @param Parameters $parameters
-	 * @param Parser $parser
-	 * @return mixed
 	 */
-	public static function newFromStyle( $style, Parameters $parameters, Parser $parser ) {
+	public static function newFromStyle( string $style, Parameters $parameters, Parser $parser ): Lister {
 		$style = strtolower( $style );
 
 		switch ( $style ) {
@@ -324,7 +317,7 @@ class Lister {
 	 *
 	 * @return Parameters
 	 */
-	public function getParameters() {
+	public function getParameters(): Parameters {
 		return $this->parameters;
 	}
 
@@ -333,7 +326,7 @@ class Lister {
 	 *
 	 * @param string $attributes
 	 */
-	public function setHeadListAttributes( $attributes ) {
+	public function setHeadListAttributes( $attributes ): void {
 		$this->headListAttributes = Sanitizer::fixTagAttributes( $attributes, 'ul' );
 	}
 
@@ -342,7 +335,7 @@ class Lister {
 	 *
 	 * @param string $attributes
 	 */
-	public function setHeadItemAttributes( $attributes ) {
+	public function setHeadItemAttributes( $attributes ): void {
 		$this->headItemAttributes = Sanitizer::fixTagAttributes( $attributes, 'li' );
 	}
 
@@ -351,7 +344,7 @@ class Lister {
 	 *
 	 * @param string $attributes
 	 */
-	public function setListAttributes( $attributes ) {
+	public function setListAttributes( $attributes ): void {
 		$this->listAttributes = Sanitizer::fixTagAttributes( $attributes, 'ul' );
 	}
 
@@ -360,7 +353,7 @@ class Lister {
 	 *
 	 * @param string $attributes
 	 */
-	public function setItemAttributes( $attributes ) {
+	public function setItemAttributes( $attributes ): void {
 		$this->itemAttributes = Sanitizer::fixTagAttributes( $attributes, 'li' );
 	}
 
@@ -369,7 +362,7 @@ class Lister {
 	 *
 	 * @param int $count
 	 */
-	public function setDominantSectionCount( $count = -1 ) {
+	public function setDominantSectionCount( $count = -1 ): void {
 		$this->dominantSectionCount = intval( $count );
 	}
 
@@ -396,7 +389,7 @@ class Lister {
 	 *
 	 * @param string $suffix
 	 */
-	public function setTemplateSuffix( $suffix = '.default' ) {
+	public function setTemplateSuffix( $suffix = '.default' ): void {
 		$this->templateSuffix = $suffix;
 	}
 
@@ -414,7 +407,7 @@ class Lister {
 	 *
 	 * @param bool $trim
 	 */
-	public function setTrimIncluded( $trim = false ) {
+	public function setTrimIncluded( $trim = false ): void {
 		$this->trimIncluded = boolval( $trim );
 	}
 
@@ -433,7 +426,7 @@ class Lister {
 	 *
 	 * @param bool $escape
 	 */
-	public function setEscapeLinks( $escape = true ) {
+	public function setEscapeLinks( $escape = true ): void {
 		$this->escapeLinks = boolval( $escape );
 	}
 
@@ -451,7 +444,7 @@ class Lister {
 	 *
 	 * @param int|null $index
 	 */
-	public function setTableSortColumn( $index = null ) {
+	public function setTableSortColumn( $index = null ): void {
 		$this->tableSortColumn = $index === null ? null : intval( $index );
 	}
 
@@ -469,8 +462,8 @@ class Lister {
 	 *
 	 * @param string|null $method
 	 */
-	public function setTableSortMethod( $method = null ) {
-		$this->tableSortMethod = $method === null ? 'standard' : $method;
+	public function setTableSortMethod( $method = null ): void {
+		$this->tableSortMethod = $method ?? 'standard';
 	}
 
 	/**
@@ -487,7 +480,7 @@ class Lister {
 	 *
 	 * @param int|null $length
 	 */
-	public function setTitleMaxLength( $length = null ) {
+	public function setTitleMaxLength( $length = null ): void {
 		$this->titleMaxLength = $length === null ? null : intval( $length );
 	}
 
@@ -505,7 +498,7 @@ class Lister {
 	 *
 	 * @param ?array $separators
 	 */
-	public function setSectionSeparators( ?array $separators ) {
+	public function setSectionSeparators( ?array $separators ): void {
 		$this->sectionSeparators = $separators ?? [];
 	}
 
@@ -514,7 +507,7 @@ class Lister {
 	 *
 	 * @param ?array $separators
 	 */
-	public function setMultiSectionSeparators( ?array $separators ) {
+	public function setMultiSectionSeparators( ?array $separators ): void {
 		$this->multiSectionSeparators = $separators ?? [];
 	}
 
@@ -523,7 +516,7 @@ class Lister {
 	 *
 	 * @param bool $include
 	 */
-	public function setIncludePageText( $include = false ) {
+	public function setIncludePageText( $include = false ): void {
 		$this->includePageText = boolval( $include );
 	}
 
@@ -532,7 +525,7 @@ class Lister {
 	 *
 	 * @param int|null $length
 	 */
-	public function setIncludePageMaxLength( $length = null ) {
+	public function setIncludePageMaxLength( $length = null ): void {
 		$this->includePageMaxLength = $length === null ? null : intval( $length );
 	}
 
@@ -541,7 +534,7 @@ class Lister {
 	 *
 	 * @param array	$pageTextMatch
 	 */
-	public function setPageTextMatch( array $pageTextMatch = [] ) {
+	public function setPageTextMatch( array $pageTextMatch = [] ): void {
 		$this->pageTextMatch = $pageTextMatch;
 	}
 
@@ -550,7 +543,7 @@ class Lister {
 	 *
 	 * @param array	$pageTextMatchRegex
 	 */
-	public function setPageTextMatchRegex( array $pageTextMatchRegex = [] ) {
+	public function setPageTextMatchRegex( array $pageTextMatchRegex = [] ): void {
 		$this->pageTextMatchRegex = $pageTextMatchRegex;
 	}
 
@@ -559,7 +552,7 @@ class Lister {
 	 *
 	 * @param array	$pageTextMatchNotRegex
 	 */
-	public function setPageTextMatchNotRegex( array $pageTextMatchNotRegex = [] ) {
+	public function setPageTextMatchNotRegex( array $pageTextMatchNotRegex = [] ): void {
 		$this->pageTextMatchNotRegex = $pageTextMatchNotRegex;
 	}
 
@@ -568,7 +561,7 @@ class Lister {
 	 *
 	 * @param bool $parse
 	 */
-	public function setIncludePageParsed( $parse = false ) {
+	public function setIncludePageParsed( $parse = false ): void {
 		$this->includePageParsed = boolval( $parse );
 	}
 
@@ -578,7 +571,7 @@ class Lister {
 	 * @param array $articles
 	 * @return string
 	 */
-	public function format( $articles ) {
+	public function format( $articles ): string {
 		return $this->formatList( $articles, 0, count( $articles ) );
 	}
 
@@ -590,7 +583,7 @@ class Lister {
 	 * @param int $count
 	 * @return string
 	 */
-	public function formatList( $articles, $start, $count ) {
+	public function formatList( $articles, $start, $count ): string {
 		$filteredCount = 0;
 		$items = [];
 
@@ -693,7 +686,7 @@ class Lister {
 	 *
 	 * @return string
 	 */
-	public function getHeadListStart() {
+	public function getHeadListStart(): string {
 		return sprintf( $this->headListStart, $this->headListAttributes );
 	}
 
@@ -702,7 +695,7 @@ class Lister {
 	 *
 	 * @return string
 	 */
-	public function getHeadItemStart() {
+	public function getHeadItemStart(): string {
 		return sprintf( $this->headItemStart, $this->headItemAttributes );
 	}
 
@@ -720,7 +713,7 @@ class Lister {
 	 *
 	 * @return string
 	 */
-	public function getListStart() {
+	public function getListStart(): string {
 		return sprintf( $this->listStart, $this->listAttributes );
 	}
 
@@ -729,7 +722,7 @@ class Lister {
 	 *
 	 * @return string
 	 */
-	public function getItemStart() {
+	public function getItemStart(): string {
 		return sprintf( $this->itemStart, $this->itemAttributes );
 	}
 
@@ -748,7 +741,7 @@ class Lister {
 	 * @param array $items
 	 * @return string
 	 */
-	protected function implodeItems( $items ) {
+	protected function implodeItems( $items ): string {
 		return implode( '', $items );
 	}
 
@@ -831,7 +824,7 @@ class Lister {
 	 * @param Article $article
 	 * @return string
 	 */
-	protected function replaceTagCategory( $tag, Article $article ) {
+	protected function replaceTagCategory( $tag, Article $article ): string|array {
 		if ( !empty( $article->mCategoryLinks ) ) {
 			$tag = str_replace( '%CATLIST%', implode( ', ', $article->mCategoryLinks ), $tag );
 			$tag = str_replace( '%CATBULLETS%', '* ' . implode( "\n* ", $article->mCategoryLinks ), $tag );
@@ -852,7 +845,7 @@ class Lister {
 	 * @param int $nr
 	 * @return string
 	 */
-	protected function replaceTagCount( $tag, $nr ) {
+	protected function replaceTagCount( $tag, $nr ): string {
 		return str_replace( '%NR%', (string)$nr, $tag );
 	}
 
@@ -863,7 +856,7 @@ class Lister {
 	 * @param mixed $s Index of the table row position.
 	 * @param Article $article
 	 */
-	private function replaceTagTableRow( &$pieces, $s, Article $article ) {
+	private function replaceTagTableRow( array &$pieces, $s, Article $article ): void {
 		$tableFormat = $this->getParameters()->getParameter( 'tablerow' );
 		$firstCall = true;
 
@@ -969,7 +962,7 @@ class Lister {
 	 * @param Article|string $article
 	 * @return string
 	 */
-	protected function parseImageUrlWithPath( $article ) {
+	protected function parseImageUrlWithPath( $article ): array|string|null {
 		$repoGroup = MediaWikiServices::getInstance()->getRepoGroup();
 		$pageImagesEnabled = ExtensionRegistry::getInstance()->isLoaded( 'PageImages' );
 
@@ -1019,7 +1012,7 @@ class Lister {
 	 * @param int &$filteredCount
 	 * @return string
 	 */
-	public function transcludePage( Article $article, &$filteredCount ) {
+	public function transcludePage( Article $article, &$filteredCount ): string {
 		$matchFailed = false;
 		$septag = [];
 
@@ -1300,7 +1293,7 @@ class Lister {
 	 * @param string $end
 	 * @return string
 	 */
-	protected function joinSectionTagPieces( $piece, $start, $end ) {
+	protected function joinSectionTagPieces( $piece, $start, $end ): string {
 		return $start . $piece . $end;
 	}
 

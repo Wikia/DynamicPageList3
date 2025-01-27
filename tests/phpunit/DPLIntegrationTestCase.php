@@ -5,12 +5,12 @@ namespace MediaWiki\Extension\DynamicPageList3\Tests;
 use DOMDocument;
 use DOMXPath;
 use ImportStreamSource;
-use MediaWikiIntegrationTestCase;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Parser\ParserOptions;
 use MediaWiki\Status\Status;
 use MediaWiki\User\User;
 use MediaWiki\User\UserFactory;
+use MediaWikiIntegrationTestCase;
 
 abstract class DPLIntegrationTestCase extends MediaWikiIntegrationTestCase {
 

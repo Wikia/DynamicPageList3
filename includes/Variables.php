@@ -24,7 +24,7 @@ class Variables {
 	 * @param array $arg
 	 * @return string
 	 */
-	public static function setVar( $arg ) {
+	public static function setVar( $arg ): string {
 		$numargs = count( $arg );
 
 		if ( $numargs >= 3 && $arg[2] == '' ) {
@@ -50,7 +50,7 @@ class Variables {
 	 * @param array $arg
 	 * @return string
 	 */
-	public static function setVarDefault( $arg ) {
+	public static function setVarDefault( $arg ): string {
 		$numargs = count( $arg );
 
 		if ( $numargs > 3 ) {
@@ -84,7 +84,7 @@ class Variables {
 	 * @param array $arg
 	 * @return string
 	 */
-	public static function setArray( $arg ) {
+	public static function setArray( $arg ): string {
 		$numargs = count( $arg );
 
 		if ( $numargs < 5 ) {
@@ -125,7 +125,7 @@ class Variables {
 	 * @param array $arg
 	 * @return string
 	 */
-	public static function dumpArray( $arg ) {
+	public static function dumpArray( $arg ): string {
 		$numargs = count( $arg );
 
 		if ( $numargs < 3 ) {
@@ -156,7 +156,7 @@ class Variables {
 	 * @param string $subject
 	 * @return array|string
 	 */
-	public static function printArray( $var, $delimiter, $search, $subject ) {
+	public static function printArray( $var, $delimiter, $search, $subject ): string|array {
 		$var = trim( $var );
 
 		if ( $var == '' ) {

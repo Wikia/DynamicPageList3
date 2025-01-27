@@ -15,24 +15,20 @@ use MWException;
 class Parse {
 	/**
 	 * Parameters Object
-	 *
-	 * @var Parameters
 	 */
-	private $parameters = null;
+	private readonly Parameters $parameters;
 
 	/**
 	 * Logger Object
-	 *
-	 * @var Logger
 	 */
-	private $logger = null;
+	private readonly Logger $logger;
 
 	/**
 	 * Array of prequoted table names.
 	 *
 	 * @var string[]
 	 */
-	private $tableNames = [];
+	private readonly array $tableNames;
 
 	/**
 	 * Header Output
@@ -196,9 +192,9 @@ class Parse {
 			$calcRows = true;
 		}
 
-		/*********/
+		/***/
 		/* Query */
-		/*********/
+		/***/
 		try {
 			$query = new Query( $this->parameters );
 
@@ -345,7 +341,7 @@ class Parse {
 	 * @param Parser $parser
 	 * @return array
 	 */
-	private function processQueryResults( $rows, Parser $parser ) {
+	private function processQueryResults( $rows, Parser $parser ): array {
 		/*******************************/
 		/* Random Count Pick Generator */
 		/*******************************/
@@ -425,7 +421,7 @@ class Parse {
 	 * @param string $input
 	 * @return array
 	 */
-	private function prepareUserInput( $input ) {
+	private function prepareUserInput( $input ): array {
 		// We replace double angle brackets with single angle brackets to avoid premature tag expansion in the input.
 		// The ¦ symbol is an alias for |.
 		// The combination '²{' and '}²'will be translated to double curly braces; this allows postponed template execution which is crucial for DPL queries which call other DPL queries.
@@ -489,7 +485,7 @@ class Parse {
 	 *
 	 * @param string $output
 	 */
-	private function addOutput( $output ) {
+	private function addOutput( string $output ): void {
 		$this->output .= $output;
 	}
 
@@ -510,7 +506,7 @@ class Parse {
 	 * @param bool $skipHeaderFooter
 	 * @return string
 	 */
-	private function getFullOutput( $totalResults = false, $skipHeaderFooter = true ) {
+	private function getFullOutput( $totalResults = false, bool $skipHeaderFooter = true ): string {
 		if ( !$skipHeaderFooter ) {
 			$header = '';
 			$footer = '';
@@ -544,7 +540,7 @@ class Parse {
 	 *
 	 * @param string $header
 	 */
-	private function setHeader( $header ) {
+	private function setHeader( $header ): void {
 		if ( Hooks::getDebugLevel() == 5 ) {
 			$header = '<pre><nowiki>' . $header;
 		}
@@ -566,7 +562,7 @@ class Parse {
 	 *
 	 * @param string $footer
 	 */
-	private function setFooter( $footer ) {
+	private function setFooter( $footer ): void {
 		if ( Hooks::getDebugLevel() == 5 ) {
 			$footer .= '</nowiki></pre>';
 		}
@@ -590,7 +586,7 @@ class Parse {
 	 * @param int $count
 	 * @return mixed Type to use: 'results', 'oneresult', or 'noresults'. False if invalid or none should be used.
 	 */
-	private function getHeaderFooterType( $position, $count ) {
+	private function getHeaderFooterType( string $position, int $count ): false|string {
 		$count = (int)$count;
 
 		if ( $position != 'header' && $position != 'footer' ) {
@@ -616,7 +612,7 @@ class Parse {
 	 * @param string $variable
 	 * @param string $replacement
 	 */
-	private function setVariable( $variable, $replacement ) {
+	private function setVariable( string $variable, $replacement ): void {
 		$variable = "%" . mb_strtoupper( $variable, "UTF-8" ) . "%";
 		$this->replacementVariables[$variable] = $replacement;
 	}
@@ -627,7 +623,7 @@ class Parse {
 	 * @param string $text
 	 * @return string
 	 */
-	private function replaceVariables( $text ) {
+	private function replaceVariables( $text ): string|array {
 		$text = self::replaceNewLines( $text );
 
 		foreach ( $this->replacementVariables as $variable => $replacement ) {
@@ -643,7 +639,7 @@ class Parse {
 	 * @param string $text
 	 * @return string
 	 */
-	public static function replaceNewLines( $text ) {
+	public static function replaceNewLines( $text ): string {
 		return str_replace( [ '\n', "¶" ], "\n", $text );
 	}
 
@@ -652,7 +648,7 @@ class Parse {
 	 *
 	 * @return bool
 	 */
-	private function doQueryErrorChecks() {
+	private function doQueryErrorChecks(): bool {
 		/**************************/
 		/* Parameter Error Checks */
 		/**************************/
@@ -796,7 +792,7 @@ class Parse {
 	 * @param array	$sectionLabels
 	 * @return array
 	 */
-	private static function updateTableRowKeys( $tableRow, $sectionLabels ) {
+	private static function updateTableRowKeys( $tableRow, $sectionLabels ): array {
 		$_tableRow = (array)$tableRow;
 		$tableRow = [];
 		$groupNr = -1;
@@ -860,7 +856,7 @@ class Parse {
 	 *
 	 * @param Parser $parser
 	 */
-	private function getUrlArgs( Parser $parser ) {
+	private function getUrlArgs( Parser $parser ): void {
 		$args = $this->request->getValues();
 
 		foreach ( $args as $argName => $argValue ) {
@@ -882,7 +878,7 @@ class Parse {
 	 * @param array $scrollVariables
 	 * @param Parser $parser
 	 */
-	private function defineScrollVariables( $scrollVariables, Parser $parser ) {
+	private function defineScrollVariables( array $scrollVariables, Parser $parser ): void {
 		$scrollVariables = (array)$scrollVariables;
 
 		foreach ( $scrollVariables as $variable => $value ) {
@@ -903,7 +899,7 @@ class Parse {
 	 * @param bool $isParserTag
 	 * @param Parser $parser
 	 */
-	private function triggerEndResets( $output, &$reset, &$eliminate, $isParserTag, Parser $parser ) {
+	private function triggerEndResets( string $output, &$reset, &$eliminate, $isParserTag, Parser $parser ): void {
 		$localParser = MediaWikiServices::getInstance()->getParserFactory()->create();
 
 		$page = $parser->getPage();
@@ -999,7 +995,7 @@ class Parse {
 	 * @param array	$articles
 	 * @return array
 	 */
-	private function cardSuitSort( $articles ) {
+	private function cardSuitSort( array $articles ): array {
 		$sortKeys = [];
 
 		foreach ( $articles as $key => $article ) {

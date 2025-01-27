@@ -78,7 +78,7 @@ class InlineList extends Lister {
 	 * @param array $items
 	 * @return string
 	 */
-	protected function implodeItems( $items ) {
+	protected function implodeItems( $items ): string {
 		return implode( $this->textSeparator, $items );
 	}
 }

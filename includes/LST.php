@@ -46,7 +46,7 @@ class LST {
 	 * @param string $part1
 	 * @return bool
 	 */
-	public static function open( $parser, $part1 ) {
+	public static function open( $parser, $part1 ): bool {
 		// Infinite loop test
 		if ( isset( $parser->mTemplatePath[$part1] ) ) {
 			wfDebug( __METHOD__ . ": template loop broken at '$part1'\n" );
@@ -69,7 +69,7 @@ class LST {
 	 * @param Parser $parser
 	 * @param string $part1
 	 */
-	public static function close( $parser, $part1 ) {
+	public static function close( $parser, $part1 ): void {
 		// Infinite loop test
 		if ( isset( $parser->mTemplatePath[$part1] ) ) {
 			unset( $parser->mTemplatePath[$part1] );
@@ -93,7 +93,7 @@ class LST {
 	 * @param array $skipPattern
 	 * @return string
 	 */
-	private static function parse( $parser, $text, $part1, $skiphead = 0, $recursionCheck = true, $maxLength = -1, $link = '', $trim = false, $skipPattern = [] ) {
+	private static function parse( $parser, string $text, string $part1, int $skiphead = 0, $recursionCheck = true, $maxLength = -1, $link = '', $trim = false, $skipPattern = [] ) {
 		// if someone tries something like<section begin=blah>lst only</section>
 		// text, may as well do the right thing.
 		$text = str_replace( '</section>', '', $text );
@@ -137,7 +137,7 @@ class LST {
 	 * @param bool &$any
 	 * @return string
 	 */
-	private static function createSectionPattern( $sec, $to, &$any ) {
+	private static function createSectionPattern( $sec, $to, bool &$any ): string {
 		$any = false;
 		$to_sec = ( $to == '' ) ? $sec : $to;
 
@@ -177,7 +177,7 @@ class LST {
 	 * @param int $limit Cutoff point in the text to stop searching
 	 * @return int Number of matches
 	 */
-	private static function countHeadings( $text, $limit ) {
+	private static function countHeadings( $text, $limit ): int {
 		$pat = '^(={1,6}).+\1\s*$()';
 
 		$count = 0;
@@ -206,7 +206,7 @@ class LST {
 	 * @param string &$text wikitext output
 	 * @return bool true if returning text, false if target not found
 	 */
-	public static function text( $parser, $page, &$title, &$text ) {
+	public static function text( $parser, $page, &$title, &$text ): bool {
 		$title = Title::newFromText( $page );
 
 		if ( $title === null ) {
@@ -237,7 +237,7 @@ class LST {
 	 * @param array $skipPattern
 	 * @return array
 	 */
-	public static function includeSection( $parser, $page = '', $sec = '', $to = '', $recursionCheck = true, $trim = false, $skipPattern = [] ) {
+	public static function includeSection( $parser, $page = '', $sec = '', $to = '', $recursionCheck = true, $trim = false, $skipPattern = [] ): array {
 		$output = [];
 
 		if ( self::text( $parser, $page, $title, $text ) == false ) {
@@ -405,7 +405,7 @@ class LST {
 	 * @param array $skipPattern
 	 * @return array
 	 */
-	public static function includeHeading( $parser, $page, $sec, $to, &$sectionHeading, $recursionCheck, $maxLength, $link, $trim, $skipPattern ) {
+	public static function includeHeading( $parser, $page, $sec, $to, &$sectionHeading, $recursionCheck, $maxLength, $link, $trim, $skipPattern ): array {
 		$output = [];
 
 		if ( self::text( $parser, $page, $title, $text ) == false ) {
@@ -437,7 +437,7 @@ class LST {
 	 * @param array $skipPattern
 	 * @return array
 	 */
-	public static function extractHeadingFromText( $parser, $page, $title, $text, $sec, $to, &$sectionHeading, $recursionCheck, $maxLength, $cLink, $trim, $skipPattern = [] ) {
+	public static function extractHeadingFromText( $parser, $page, $title, $text, $sec, $to, &$sectionHeading, $recursionCheck, $maxLength, $cLink, $trim, $skipPattern = [] ): array {
 		$continueSearch = true;
 		$output = [];
 
@@ -480,7 +480,7 @@ class LST {
 				}
 
 				if ( preg_match( "/$pat/im", $text, $m, PREG_OFFSET_CAPTURE ) ) {
-					$begin_off = end($m)[1];
+					$begin_off = end( $m )[1];
 					$head_len = strlen( $m[1][0] );
 					$headLine = trim( $m[0][0], "\n =\t" );
 				} elseif ( $nr == -2 ) {
@@ -622,7 +622,7 @@ class LST {
 	 * @param string $catlist
 	 * @return array
 	 */
-	public static function includeTemplate( $parser, Lister $lister, $dplNr, $article, $template1, $template2, $defaultTemplate, $mustMatch, $mustNotMatch, $matchParsed, $catlist ) {
+	public static function includeTemplate( $parser, Lister $lister, $dplNr, $article, $template1, $template2, $defaultTemplate, $mustMatch, $mustNotMatch, $matchParsed, $catlist ): array {
 		$page = $article->mTitle->getPrefixedText();
 		$date = $article->myDate;
 		$user = $article->mUserLink;
@@ -887,7 +887,7 @@ class LST {
 	 * @param string $pattern
 	 * @return string
 	 */
-	public static function spaceOrUnderscore( $pattern ) {
+	public static function spaceOrUnderscore( $pattern ): string {
 		// returns a pettern that matches underscores as well as spaces
 		return str_replace( ' ', '[ _]', $pattern );
 	}

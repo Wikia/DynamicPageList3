@@ -56,7 +56,7 @@ class UserFormatList extends Lister {
 	 * @param int $count
 	 * @return string
 	 */
-	public function formatList( $articles, $start, $count ) {
+	public function formatList( $articles, $start, $count ): string {
 		$filteredCount = 0;
 		$items = [];
 
@@ -194,7 +194,7 @@ class UserFormatList extends Lister {
 	 *
 	 * @return string
 	 */
-	public function getItemStart() {
+	public function getItemStart(): string {
 		return $this->replaceTagCount( $this->itemStart, $this->getRowCount() );
 	}
 
@@ -203,7 +203,7 @@ class UserFormatList extends Lister {
 	 *
 	 * @return string
 	 */
-	public function getItemEnd() {
+	public function getItemEnd(): string {
 		return $this->replaceTagCount( $this->itemEnd, $this->getRowCount() );
 	}
 
@@ -213,7 +213,7 @@ class UserFormatList extends Lister {
 	 * @param array $items
 	 * @return string
 	 */
-	protected function implodeItems( $items ) {
+	protected function implodeItems( $items ): string {
 		return implode( $this->textSeparator, $items );
 	}
 }

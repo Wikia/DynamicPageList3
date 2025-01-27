@@ -2,6 +2,7 @@
 
 namespace MediaWiki\Extension\DynamicPageList3;
 
+use MediaWiki\MediaWikiServices;
 use MWException;
 
 class Config {
@@ -17,11 +18,12 @@ class Config {
 	 *
 	 * @param array|false $settings
 	 */
-	public static function init( $settings = false ) {
+	public static function init( $settings = false ): void {
 		if ( $settings === false ) {
-			global $wgDplSettings;
+			$config = MediaWikiServices::getInstance()->getMainConfig();
+			$dplSettings = $config->get( 'DplSettings' );
 
-			$settings = $wgDplSettings ?? false;
+			$settings = $dplSettings ?? false;
 		}
 
 		if ( !is_array( $settings ) ) {
@@ -56,7 +58,7 @@ class Config {
 	 * @param string $setting
 	 * @param mixed|null $value
 	 */
-	public static function setSetting( $setting, $value = null ) {
+	public static function setSetting( $setting, $value = null ): void {
 		if ( empty( $setting ) || !is_string( $setting ) ) {
 			throw new MWException( __METHOD__ . ": Setting keys can not be blank." );
 		}

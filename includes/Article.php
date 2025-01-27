@@ -17,13 +17,6 @@ class Article {
 	public $mTitle;
 
 	/**
-	 * Namespace ID
-	 *
-	 * @var int
-	 */
-	public $mNamespace = -1;
-
-	/**
 	 * Page ID
 	 *
 	 * @var int
@@ -181,7 +174,7 @@ class Article {
 	 * @param Title $title
 	 * @param int $namespace
 	 */
-	public function __construct( Title $title, $namespace ) {
+	public function __construct( Title $title, int $namespace ) {
 		$this->mTitle = $title;
 		$this->mNamespace = $namespace;
 	}
@@ -385,7 +378,7 @@ class Article {
 	 * Reset the headings to their initial state.
 	 * Ideally this Article class should not exist and be handled by the built in MediaWiki class.
 	 */
-	public static function resetHeadings() {
+	public static function resetHeadings(): void {
 		self::$headings = [];
 	}
 
