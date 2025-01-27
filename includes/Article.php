@@ -17,6 +17,13 @@ class Article {
 	public $mTitle;
 
 	/**
+	 * Namespace ID
+	 *
+	 * @var int
+	 */
+	public $mNamespace = -1;
+
+	/**
 	 * Page ID
 	 *
 	 * @var int
