@@ -219,7 +219,17 @@ class Hooks {
 
 		// we can remove the categories by save/restore
 		if ( $reset['categories'] ?? false ) {
-			$saveCategories = $parser->getOutput()->getCategories();
+			$parserOutput = $parser->getOutput();
+			if ( method_exists( $parserOutput, 'getCategoryNames' ) && method_exists( $parserOutput, 'getCategorySortKey' ) ) {
+				$saveCategories = array_combine(
+					$parserOutput->getCategoryNames(),
+					// @phan-suppress-next-line PhanUndeclaredMethod
+					array_map( fn ( $value ) => $parserOutput->getCategorySortKey( $value ), $parserOutput->getCategoryNames() )
+				);
+			} else {
+				// @phan-suppress-next-line PhanUndeclaredMethod
+				$saveCategories = $parserOutput->getCategories();
+			}
 		}
 
 		// we can remove the images by save/restore
@@ -558,9 +568,19 @@ class Hooks {
 		if ( !self::$createdLinks['resetdone'] ) {
 			self::$createdLinks['resetdone'] = true;
 
-			foreach ( $parser->getOutput()->getCategories() as $key => $val ) {
-				if ( array_key_exists( $key, self::$fixedCategories ) ) {
-					self::$fixedCategories[$key] = $val;
+			if ( method_exists( $parser->getOutput(), 'getCategoryNames' ) && method_exists( $parser->getOutput(), 'getCategorySortKey' ) ) {
+				foreach ( $parser->getOutput()->getCategoryNames() as $key ) {
+					if ( array_key_exists( $key, self::$fixedCategories ) ) {
+						// @phan-suppress-next-line PhanUndeclaredMethod
+						self::$fixedCategories[$key] = $parser->getOutput()->getCategorySortKey( $key );
+					}
+				}
+			} else {
+				// @phan-suppress-next-line PhanUndeclaredMethod
+				foreach ( $parser->getOutput()->getCategories() as $key => $val ) {
+					if ( array_key_exists( $key, self::$fixedCategories ) ) {
+						self::$fixedCategories[$key] = $val;
+					}
 				}
 			}
 
@@ -599,38 +619,46 @@ class Hooks {
 					if ( !array_key_exists( $nsp, self::$createdLinks[0] ) ) {
 						continue;
 					}
-					$outputLinks = $parser->getOutput()->getLinks();
 
-					$outputLinks[$nsp] = array_diff_assoc( $outputLinks[$nsp], self::$createdLinks[0][$nsp] );
+					$parser->getOutput()->mLinks[$nsp] = array_diff_assoc( $parser->getOutput()->getLinks()[$nsp], self::$createdLinks[0][$nsp] );
 
-					if ( count( $outputLinks[$nsp] ) == 0 ) {
-						unset( $outputLinks[$nsp] );
+					if ( count( $parser->getOutput()->getLinks()[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mLinks[$nsp] );
 					}
 				}
 			}
-			$outputTemplates = $parser->getOutput()->getTemplates();
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 1, self::$createdLinks ) ) {
-				foreach ( $outputTemplates as $nsp => $tpl ) {
+				foreach ( $parser->getOutput()->getTemplates() as $nsp => $tpl ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[1] ) ) {
 						continue;
 					}
 
-					$outputTemplates[$nsp] = array_diff_assoc( $outputTemplates[$nsp], self::$createdLinks[1][$nsp] );
+					$parser->getOutput()->mTemplates[$nsp] = array_diff_assoc( $parser->getOutput()->getTemplates()[$nsp], self::$createdLinks[1][$nsp] );
 
-					if ( count( $outputTemplates[$nsp] ) == 0 ) {
-						unset( $outputTemplates[$nsp] );
+					if ( count( $parser->getOutput()->getTemplates()[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mTemplates[$nsp] );
 					}
 				}
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 2, self::$createdLinks ) ) {
-				$parser->getOutput()->setCategories( array_diff_assoc( $parser->getOutput()->getCategories(), self::$createdLinks[2] ) );
+				$parserOutput = $parser->getOutput();
+				if ( method_exists( $parserOutput, 'getCategoryNames' ) && method_exists( $parserOutput, 'getCategorySortKey' ) ) {
+					$categories = array_combine(
+						$parserOutput->getCategoryNames(),
+						// @phan-suppress-next-line PhanUndeclaredMethod
+						array_map( fn ( $value ) => $parserOutput->getCategorySortKey( $value ), $parserOutput->getCategoryNames() )
+					);
+					$parser->getOutput()->setCategories( array_diff_assoc( $categories, self::$createdLinks[2] ) );
+				} else {
+					// @phan-suppress-next-line PhanUndeclaredMethod
+					$parser->getOutput()->setCategories( array_diff_assoc( $parserOutput->getCategories(), self::$createdLinks[2] ) );
+				}
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 3, self::$createdLinks ) ) {
-				$outputImages = $parser->getOutput()->getImages();
-				$outputImages = array_diff_assoc( $outputImages, self::$createdLinks[3] );
+				$parser->getOutput()->mImages = array_diff_assoc( $parser->getOutput()->getImages(), self::$createdLinks[3] );
 			}
 		}
 	}
