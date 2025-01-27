@@ -5,13 +5,13 @@ namespace MediaWiki\Extension\DynamicPageList3;
 use DateInterval;
 use DateTime;
 use Exception;
-use ExtensionRegistry;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\PoolCounter\PoolCounterWorkViaCallback;
+use MediaWiki\Registration\ExtensionRegistry;
 use MediaWiki\User\UserFactory;
+use MediaWiki\WikiMap\WikiMap;
 use MWException;
-use PoolCounterWorkViaCallback;
-use WANObjectCache;
-use WikiMap;
+use Wikimedia\ObjectCache\WANObjectCache;
 use Wikimedia\Rdbms\Database;
 use Wikimedia\Rdbms\IDatabase;
 
