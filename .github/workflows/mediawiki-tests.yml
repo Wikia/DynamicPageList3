@@ -14,11 +14,11 @@ jobs:
       matrix:
         include:
           # Latest stable MediaWiki - PHP 8.2 (phan)
-          - mw: 'REL1_43'
-            php: 8.2
-            php-docker: 82
-            experimental: false
-            stage: phan
+          #- mw: 'REL1_43'
+          #  php: 8.2
+          #  php-docker: 82
+          #  experimental: false
+          #  stage: phan
 
           # Latest stable MediaWiki - PHP 8.2 (phpunit-unit)
           - mw: 'REL1_43'

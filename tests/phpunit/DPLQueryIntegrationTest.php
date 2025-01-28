@@ -374,4 +374,38 @@ class DPLQueryIntegrationTest extends DPLIntegrationTestCase {
 			true
 		);
 	}
+
+	public function testFindPagesLinkingToPage(): void {
+		$results = $this->getDPLQueryResults( [
+			// NS_MAIN
+			'namespace' => '',
+			'linksto' => 'DPLTestArticle 2',
+		] );
+
+		$this->assertArrayEquals(
+			[
+				'DPLTestArticle 1',
+				'DPLTestOpenReferences',
+			],
+			$results,
+			true
+		);
+	}
+
+	public function testFindPagesLinkedFromPage(): void {
+		$results = $this->getDPLQueryResults( [
+			// NS_MAIN
+			'namespace' => '',
+			'linksfrom' => 'DPLTestArticle 1',
+		] );
+
+		$this->assertArrayEquals(
+			[
+				'DPLTestArticle 2',
+				'DPLTestArticleNoCategory',
+			],
+			$results,
+			true
+		);
+	}
 }
