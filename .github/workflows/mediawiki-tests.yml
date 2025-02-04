@@ -13,94 +13,45 @@ jobs:
     strategy:
       matrix:
         include:
-          # Latest stable MediaWiki - PHP 7.4 (phan)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: phan
+          # Latest stable MediaWiki - PHP 8.2 (phan)
+          #- mw: 'REL1_43'
+          #  php: 8.2
+          #  php-docker: 82
+          #  experimental: false
+          #  stage: phan
 
-          # Latest MediaWiki master - PHP 7.4 (phan)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: true
-            stage: phan
-
-          # Latest MediaWiki master - PHP 7.4 (coverage)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: coverage
-
-          # Latest stable MediaWiki - PHP 7.4 (phpunit-unit)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
+          # Latest stable MediaWiki - PHP 8.2 (phpunit-unit)
+          - mw: 'REL1_43'
+            php: 8.2
+            php-docker: 82
             experimental: false
             stage: phpunit-unit
 
-          # Latest MediaWiki master - PHP 7.4 (phpunit-unit)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: phpunit-unit
-
-          # Latest stable MediaWiki - PHP 7.4 (phpunit)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
+          # Latest stable MediaWiki - PHP 8.2 (phpunit)
+          - mw: 'REL1_43'
+            php: 8.2
+            php-docker: 82
             experimental: false
             stage: phpunit
 
-          # Latest MediaWiki master - PHP 7.4 (phpunit)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: phpunit
-
-          # Latest MediaWiki master - PHP 8.1 (phpunit)
-          - mw: 'master'
-            php: 8.1
-            php-docker: 81
-            experimental: false
-            stage: phpunit
-
-          # Latest stable MediaWiki - PHP 7.4 (selenium)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
+          # Latest stable MediaWiki - PHP 8.2 (selenium)
+          - mw: 'REL1_43'
+            php: 8.2
+            php-docker: 82
             experimental: false
             stage: selenium
 
-          # Latest MediaWiki master - PHP 7.4 (selenium)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: selenium
-
-          # Latest stable MediaWiki - PHP 7.4 (qunit)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
+          # Latest stable MediaWiki - PHP 8.2 (qunit)
+          - mw: 'REL1_43'
+            php: 8.2
+            php-docker: 82
             experimental: false
             stage: qunit
 
-          # Latest MediaWiki master - PHP 7.4 (qunit)
-          - mw: 'master'
-            php: 7.4
-            php-docker: 74
-            experimental: false
-            stage: qunit
-
-          # Latest stable MediaWiki - PHP 7.4 (composer-test)
-          - mw: 'REL1_39'
-            php: 7.4
-            php-docker: 74
+          # Latest stable MediaWiki - PHP 8.2 (composer-test)
+          - mw: 'REL1_43'
+            php: 8.2
+            php-docker: 82
             experimental: false
             stage: composer-test
 
@@ -115,11 +66,11 @@ jobs:
 
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.11.0
+        uses: styfle/cancel-workflow-action@0.12.1
         with:
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # /home/runner/cache/                               Cache
       # /home/runner/src/                                 Mediawiki installation
@@ -155,12 +106,12 @@ jobs:
           if [ -e .github/workflows/dependencies ] && [ "${{ matrix.stage }}" == 'phan' ]; then
             cd .github/workflows
             curl -sL https://raw.githubusercontent.com/wikimedia/integration-config/master/zuul/parameter_functions.py -o pf.py
-            curl -sL https://raw.githubusercontent.com/Universal-Omega/scripts/master/mediawiki/resolve_dependencies.py -o rd.py
+            curl -sL https://raw.githubusercontent.com/WikiForge/ci-scripts/master/mediawiki/resolve_dependencies.py -o rd.py
             echo "DEPENDENCIES=$(python3 rd.py)" >> $GITHUB_ENV
           fi
 
       - name: Cache docker image
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /home/runner/docker-images/${{ env.DOCKER_IMAGE }}
           key: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_LATEST_TAG }}
@@ -172,7 +123,7 @@ jobs:
 
       - name: Cache quibble docker image
         if: ${{ matrix.stage == 'coverage' || matrix.stage == 'phan' }}
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /home/runner/docker-images/${{ env.QUIBBLE_DOCKER_IMAGE }}
           key: ${{ env.QUIBBLE_DOCKER_IMAGE }}:${{ env.QUIBBLE_DOCKER_LATEST_TAG }}
@@ -208,10 +159,10 @@ jobs:
           git -C src/ log -n 1 --format="%H"
 
       - name: Cache dependencies (composer and npm)
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /home/runner/cache
-          key: ${{ runner.os }}-${{ env.MEDIAWIKI_VERSION }}-${{ hashFiles('**/*.lock') }}
+          key: ${{ runner.os }}-${{ env.MEDIAWIKI_VERSION }}-${{ hashFiles('**/*.json') }}
 
       - name: Setup PHP Action
         if: ${{ matrix.stage == 'phan' }}
@@ -307,7 +258,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ matrix.stage == 'coverage' }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           directory: /home/runner/cover
 

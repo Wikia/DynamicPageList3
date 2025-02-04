@@ -46,7 +46,7 @@ class SubPageList extends UnorderedList {
 	 * @param int $count
 	 * @return string
 	 */
-	public function formatList( $articles, $start, $count ) {
+	public function formatList( $articles, $start, $count ): string {
 		$filteredCount = 0;
 		$items = [];
 
@@ -108,7 +108,7 @@ class SubPageList extends UnorderedList {
 	 * @param array $items
 	 * @return string
 	 */
-	protected function implodeItems( $items ) {
+	protected function implodeItems( $items ): string {
 		$list = '';
 
 		foreach ( $items as $key => $item ) {

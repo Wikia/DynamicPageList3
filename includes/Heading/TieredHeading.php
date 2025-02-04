@@ -36,10 +36,8 @@ class TieredHeading extends Heading {
 
 	/**
 	 * Tier Level
-	 *
-	 * @var string
 	 */
-	private $tierLevel = 'eader';
+	private readonly string $tierLevel;
 
 	/**
 	 * @param Parameters $parameters
@@ -60,7 +58,7 @@ class TieredHeading extends Heading {
 	 * @param Lister $lister
 	 * @return string
 	 */
-	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ) {
+	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ): string {
 		$item = '';
 
 		$item .= $this->getItemStart() . $headingLink;
@@ -80,7 +78,7 @@ class TieredHeading extends Heading {
 	 *
 	 * @return string
 	 */
-	public function getListStart() {
+	public function getListStart(): string {
 		return sprintf( $this->listStart, $this->listAttributes );
 	}
 
@@ -89,7 +87,7 @@ class TieredHeading extends Heading {
 	 *
 	 * @return string
 	 */
-	public function getItemStart() {
+	public function getItemStart(): string {
 		return sprintf( $this->itemStart, $this->itemAttributes, $this->tierLevel );
 	}
 
@@ -98,7 +96,7 @@ class TieredHeading extends Heading {
 	 *
 	 * @return string
 	 */
-	public function getItemEnd() {
+	public function getItemEnd(): string {
 		return sprintf( $this->itemEnd, $this->itemAttributes, $this->tierLevel );
 	}
 }

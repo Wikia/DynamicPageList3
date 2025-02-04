@@ -1164,7 +1164,7 @@ class ParametersData {
 	 * @param string $parameter
 	 * @return bool
 	 */
-	public function exists( $parameter ) {
+	public function exists( $parameter ): bool {
 		return array_key_exists( $parameter, $this->data );
 	}
 
@@ -1187,7 +1187,7 @@ class ParametersData {
 	 *
 	 * @param int $level
 	 */
-	public function setRichness( $level ) {
+	public function setRichness( $level ): void {
 		$this->parameterRichness = intval( $level );
 	}
 
@@ -1225,7 +1225,7 @@ class ParametersData {
 	 * @param int|null $level
 	 * @return array
 	 */
-	public function getParametersForRichness( $level = null ) {
+	public function getParametersForRichness( $level = null ): array {
 		if ( $level === null ) {
 			$level = $this->getRichness();
 		}
@@ -1247,7 +1247,7 @@ class ParametersData {
 	 * @param string $parameter
 	 * @return mixed
 	 */
-	public function getDefault( $parameter ) {
+	public function getDefault( $parameter ): ?bool {
 		if ( array_key_exists( $parameter, $this->data ) ) {
 			if ( array_key_exists( 'default', $this->data[$parameter] ) ) {
 				return (bool)$this->data[$parameter]['default'];

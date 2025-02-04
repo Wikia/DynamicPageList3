@@ -2,7 +2,7 @@
 
 namespace MediaWiki\Extension\DynamicPageList3\Lister;
 
-use CategoryViewer;
+use MediaWiki\Category\CategoryViewer;
 use MediaWiki\Extension\DynamicPageList3\Article;
 use MediaWiki\Extension\DynamicPageList3\Config;
 
@@ -22,7 +22,7 @@ class CategoryList extends Lister {
 	 * @param int $count
 	 * @return string Formatted list.
 	 */
-	public function formatList( $articles, $start, $count ) {
+	public function formatList( $articles, $start, $count ): string {
 		$articleLinks = [];
 		$articleStartChars = [];
 
@@ -54,7 +54,7 @@ class CategoryList extends Lister {
 	 * @param string|null $pageText
 	 * @return string
 	 */
-	public function formatItem( Article $article, $pageText = null ) {
+	public function formatItem( Article $article, $pageText = null ): string {
 		return '';
 	}
 }

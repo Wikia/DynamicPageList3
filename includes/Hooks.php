@@ -2,12 +2,12 @@
 
 namespace MediaWiki\Extension\DynamicPageList3;
 
-use DatabaseUpdater;
-use ExtensionRegistry;
 use MediaWiki\Extension\DynamicPageList3\Maintenance\CreateTemplate;
 use MediaWiki\Extension\DynamicPageList3\Maintenance\CreateView;
-use Parser;
-use PPFrame;
+use MediaWiki\Installer\DatabaseUpdater;
+use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\PPFrame;
+use MediaWiki\Registration\ExtensionRegistry;
 
 class Hooks {
 
@@ -94,7 +94,7 @@ class Hooks {
 	 *
 	 * @param Parser $parser
 	 */
-	public static function onParserFirstCallInit( Parser $parser ) {
+	public static function onParserFirstCallInit( Parser $parser ): void {
 		self::init();
 
 		// DPL offers the same functionality as Intersection. So we register the <DynamicPageList> tag in case LabeledSection Extension is not installed so that the section markers are removed.
@@ -118,7 +118,7 @@ class Hooks {
 	 *
 	 * @param Parser $parser
 	 */
-	public static function setupMigration( Parser $parser ) {
+	public static function setupMigration( Parser $parser ): void {
 		$parser->setHook( 'Intersection', [ __CLASS__, 'intersectionTag' ] );
 		$parser->addTrackingCategory( 'dpl-intersection-tracking-category' );
 
@@ -128,7 +128,7 @@ class Hooks {
 	/**
 	 * Common initializer for usage from parser entry points.
 	 */
-	private static function init() {
+	private static function init(): void {
 		Config::init();
 
 		if ( !isset( self::$createdLinks ) ) {
@@ -148,7 +148,7 @@ class Hooks {
 	 *
 	 * @param bool $mode
 	 */
-	private static function setLikeIntersection( $mode = false ) {
+	private static function setLikeIntersection( bool $mode = false ): void {
 		self::$likeIntersection = $mode;
 	}
 
@@ -157,7 +157,7 @@ class Hooks {
 	 *
 	 * @return bool
 	 */
-	public static function isLikeIntersection() {
+	public static function isLikeIntersection(): bool {
 		return (bool)self::$likeIntersection;
 	}
 
@@ -219,7 +219,17 @@ class Hooks {
 
 		// we can remove the categories by save/restore
 		if ( $reset['categories'] ?? false ) {
-			$saveCategories = $parser->getOutput()->getCategories();
+			$parserOutput = $parser->getOutput();
+			if ( method_exists( $parserOutput, 'getCategoryNames' ) && method_exists( $parserOutput, 'getCategorySortKey' ) ) {
+				$saveCategories = array_combine(
+					$parserOutput->getCategoryNames(),
+					// @phan-suppress-next-line PhanUndeclaredMethod
+					array_map( fn ( $value ) => $parserOutput->getCategorySortKey( $value ), $parserOutput->getCategoryNames() )
+				);
+			} else {
+				// @phan-suppress-next-line PhanUndeclaredMethod
+				$saveCategories = $parserOutput->getCategories();
+			}
 		}
 
 		// we can remove the images by save/restore
@@ -229,8 +239,7 @@ class Hooks {
 
 		$parsedDPL = $parser->recursiveTagParse( $text );
 		if ( $reset['templates'] ?? false ) {
-			$outputTemplates = $parser->getOutput()->getTemplates();
-			$outputTemplates = $saveTemplates ?? [];
+			$parser->getOutput()->mTemplates = $saveTemplates ?? [];
 		}
 
 		if ( $reset['categories'] ?? false ) {
@@ -238,8 +247,7 @@ class Hooks {
 		}
 
 		if ( $reset['images'] ?? false ) {
-			$outputImages = $parser->getOutput()->getImages();
-			$outputImages = $saveImages ?? [];
+			$parser->getOutput()->mImages = $saveImages ?? [];
 		}
 
 		return $parsedDPL;
@@ -247,11 +255,8 @@ class Hooks {
 
 	/**
 	 * The #dpl parser tag entry point.
-	 *
-	 * @param Parser $parser
-	 * @return array|string
 	 */
-	public static function dplParserFunction( $parser ) {
+	public static function dplParserFunction( Parser $parser ): array|string {
 		self::setLikeIntersection( false );
 
 		$parser->addTrackingCategory( 'dpl-parserfunc-tracking-category' );
@@ -288,12 +293,8 @@ class Hooks {
 	/**
 	 * The #dplnum parser tag entry point.
 	 * From the old documentation: "Tries to guess a number that is buried in the text. Uses a set of heuristic rules which may work or not. The idea is to extract the number so that it can be used as a sorting value in the column of a DPL table output."
-	 *
-	 * @param Parser $parser
-	 * @param string $text
-	 * @return string
 	 */
-	public static function dplNumParserFunction( $parser, $text = '' ) {
+	public static function dplNumParserFunction( Parser $parser, string $text = '' ): string {
 		$parser->addTrackingCategory( 'dplnum-parserfunc-tracking-category' );
 
 		$num = str_replace( '&#160;', ' ', $text );
@@ -314,12 +315,7 @@ class Hooks {
 		return $num;
 	}
 
-	/**
-	 * @param Parser &$parser
-	 * @param string $cmd
-	 * @return string
-	 */
-	public static function dplVarParserFunction( &$parser, $cmd ) {
+	public static function dplVarParserFunction( Parser $parser, string $cmd ): string {
 		$parser->addTrackingCategory( 'dplvar-parserfunc-tracking-category' );
 		$args = func_get_args();
 
@@ -336,7 +332,7 @@ class Hooks {
 	 * @param string $needle
 	 * @return bool
 	 */
-	private static function isRegexp( $needle ) {
+	private static function isRegexp( string $needle ): bool {
 		if ( strlen( $needle ) < 3 ) {
 			return false;
 		}
@@ -357,14 +353,7 @@ class Hooks {
 		return false;
 	}
 
-	/**
-	 * @param Parser &$parser
-	 * @param string $text
-	 * @param string $pat
-	 * @param string $repl
-	 * @return string
-	 */
-	public static function dplReplaceParserFunction( &$parser, $text, $pat = '', $repl = '' ) {
+	public static function dplReplaceParserFunction( Parser $parser, string $text, string $pat = '', string $repl = '' ): string {
 		$parser->addTrackingCategory( 'dplreplace-parserfunc-tracking-category' );
 		if ( $text == '' || $pat == '' ) {
 			return '';
@@ -389,7 +378,7 @@ class Hooks {
 	}
 
 	/**
-	 * @param Parser &$parser
+	 * @param Parser $parser
 	 * @param string $text
 	 * @param string $heading
 	 * @param int $maxLength
@@ -398,7 +387,7 @@ class Hooks {
 	 * @param bool $trim
 	 * @return string
 	 */
-	public static function dplChapterParserFunction( &$parser, $text = '', $heading = ' ', $maxLength = -1, $page = '?page?', $link = 'default', $trim = false ) {
+	public static function dplChapterParserFunction( $parser, $text = '', $heading = ' ', $maxLength = -1, $page = '?page?', $link = 'default', $trim = false ) {
 		$parser->addTrackingCategory( 'dplchapter-parserfunc-tracking-category' );
 		$output = LST::extractHeadingFromText( $parser, $page, '?title?', $text, $heading, '', $sectionHeading, true, $maxLength, $link, $trim );
 		return $output[0];
@@ -413,7 +402,7 @@ class Hooks {
 	 * @param string $matrix
 	 * @return string
 	 */
-	public static function dplMatrixParserFunction( &$parser, $name = '', $yes = '', $no = '', $flip = '', $matrix = '' ) {
+	public static function dplMatrixParserFunction( &$parser, $name = '', $yes = '', $no = '', $flip = '', $matrix = '' ): string {
 		$parser->addTrackingCategory( 'dplmatrix-parserfunc-tracking-category' );
 		$lines = explode( "\n", $matrix );
 		$m = [];
@@ -524,7 +513,7 @@ class Hooks {
 	/**
 	 * @param string $cat
 	 */
-	public static function fixCategory( $cat ) {
+	public static function fixCategory( $cat ): void {
 		if ( $cat != '' ) {
 			self::$fixedCategories[$cat] = 1;
 		}
@@ -535,7 +524,7 @@ class Hooks {
 	 *
 	 * @param int|string $level
 	 */
-	public static function setDebugLevel( $level ) {
+	public static function setDebugLevel( $level ): void {
 		self::$debugLevel = intval( $level );
 	}
 
@@ -554,13 +543,23 @@ class Hooks {
 	 * @param Parser $parser
 	 * @param string $text
 	 */
-	public static function endReset( $parser, $text ) {
+	public static function endReset( $parser, $text ): void {
 		if ( !self::$createdLinks['resetdone'] ) {
 			self::$createdLinks['resetdone'] = true;
 
-			foreach ( $parser->getOutput()->getCategories() as $key => $val ) {
-				if ( array_key_exists( $key, self::$fixedCategories ) ) {
-					self::$fixedCategories[$key] = $val;
+			if ( method_exists( $parser->getOutput(), 'getCategoryNames' ) && method_exists( $parser->getOutput(), 'getCategorySortKey' ) ) {
+				foreach ( $parser->getOutput()->getCategoryNames() as $key ) {
+					if ( array_key_exists( $key, self::$fixedCategories ) ) {
+						// @phan-suppress-next-line PhanUndeclaredMethod
+						self::$fixedCategories[$key] = $parser->getOutput()->getCategorySortKey( $key );
+					}
+				}
+			} else {
+				// @phan-suppress-next-line PhanUndeclaredMethod
+				foreach ( $parser->getOutput()->getCategories() as $key => $val ) {
+					if ( array_key_exists( $key, self::$fixedCategories ) ) {
+						self::$fixedCategories[$key] = $val;
+					}
 				}
 			}
 
@@ -591,7 +590,7 @@ class Hooks {
 	 * @param Parser $parser
 	 * @param string &$text
 	 */
-	public static function endEliminate( $parser, &$text ) {
+	public static function endEliminate( $parser, &$text ): void {
 		// called during the final output phase; removes links created by DPL
 		if ( isset( self::$createdLinks ) ) {
 			if ( array_key_exists( 0, self::$createdLinks ) ) {
@@ -599,38 +598,46 @@ class Hooks {
 					if ( !array_key_exists( $nsp, self::$createdLinks[0] ) ) {
 						continue;
 					}
-					$outputLinks = $parser->getOutput()->getLinks();
 
-					$outputLinks[$nsp] = array_diff_assoc( $outputLinks[$nsp], self::$createdLinks[0][$nsp] );
+					$parser->getOutput()->mLinks[$nsp] = array_diff_assoc( $parser->getOutput()->getLinks()[$nsp], self::$createdLinks[0][$nsp] );
 
-					if ( count( $outputLinks[$nsp] ) == 0 ) {
-						unset( $outputLinks[$nsp] );
+					if ( count( $parser->getOutput()->getLinks()[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mLinks[$nsp] );
 					}
 				}
 			}
-			$outputTemplates = $parser->getOutput()->getTemplates();
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 1, self::$createdLinks ) ) {
-				foreach ( $outputTemplates as $nsp => $tpl ) {
+				foreach ( $parser->getOutput()->getTemplates() as $nsp => $tpl ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[1] ) ) {
 						continue;
 					}
 
-					$outputTemplates[$nsp] = array_diff_assoc( $outputTemplates[$nsp], self::$createdLinks[1][$nsp] );
+					$parser->getOutput()->mTemplates[$nsp] = array_diff_assoc( $parser->getOutput()->getTemplates()[$nsp], self::$createdLinks[1][$nsp] );
 
-					if ( count( $outputTemplates[$nsp] ) == 0 ) {
-						unset( $outputTemplates[$nsp] );
+					if ( count( $parser->getOutput()->getTemplates()[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mTemplates[$nsp] );
 					}
 				}
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 2, self::$createdLinks ) ) {
-				$parser->getOutput()->setCategories( array_diff_assoc( $parser->getOutput()->getCategories(), self::$createdLinks[2] ) );
+				$parserOutput = $parser->getOutput();
+				if ( method_exists( $parserOutput, 'getCategoryNames' ) && method_exists( $parserOutput, 'getCategorySortKey' ) ) {
+					$categories = array_combine(
+						$parserOutput->getCategoryNames(),
+						// @phan-suppress-next-line PhanUndeclaredMethod
+						array_map( fn ( $value ) => $parserOutput->getCategorySortKey( $value ), $parserOutput->getCategoryNames() )
+					);
+					$parser->getOutput()->setCategories( array_diff_assoc( $categories, self::$createdLinks[2] ) );
+				} else {
+					// @phan-suppress-next-line PhanUndeclaredMethod
+					$parser->getOutput()->setCategories( array_diff_assoc( $parserOutput->getCategories(), self::$createdLinks[2] ) );
+				}
 			}
 
 			if ( isset( self::$createdLinks ) && array_key_exists( 3, self::$createdLinks ) ) {
-				$outputImages = $parser->getOutput()->getImages();
-				$outputImages = array_diff_assoc( $outputImages, self::$createdLinks[3] );
+				$parser->getOutput()->mImages = array_diff_assoc( $parser->getOutput()->getImages(), self::$createdLinks[3] );
 			}
 		}
 	}
@@ -640,7 +647,7 @@ class Hooks {
 	 *
 	 * @param DatabaseUpdater $updater
 	 */
-	public static function onLoadExtensionSchemaUpdates( DatabaseUpdater $updater ) {
+	public static function onLoadExtensionSchemaUpdates( DatabaseUpdater $updater ): void {
 		$updater->addPostDatabaseUpdateMaintenance( CreateTemplate::class );
 		$updater->addPostDatabaseUpdateMaintenance( CreateView::class );
 	}

@@ -3,7 +3,7 @@
 namespace MediaWiki\Extension\DynamicPageList3\Lister;
 
 use MediaWiki\Extension\DynamicPageList3\Parameters;
-use Parser;
+use MediaWiki\Parser\Parser;
 
 class InlineList extends Lister {
 	/**
@@ -78,7 +78,7 @@ class InlineList extends Lister {
 	 * @param array $items
 	 * @return string
 	 */
-	protected function implodeItems( $items ) {
+	protected function implodeItems( $items ): string {
 		return implode( $this->textSeparator, $items );
 	}
 }

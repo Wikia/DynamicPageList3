@@ -2,11 +2,11 @@
 
 namespace MediaWiki\Extension\DynamicPageList3;
 
+use MediaWiki\Context\RequestContext;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Title\Title;
 use MediaWiki\User\ActorStore;
-use RequestContext;
 use stdClass;
-use Title;
 
 class Article {
 	/**
@@ -181,7 +181,7 @@ class Article {
 	 * @param Title $title
 	 * @param int $namespace
 	 */
-	public function __construct( Title $title, $namespace ) {
+	public function __construct( Title $title, int $namespace ) {
 		$this->mTitle = $title;
 		$this->mNamespace = $namespace;
 	}
@@ -211,7 +211,7 @@ class Article {
 		$article = new self( $title, $pageNamespace );
 
 		$revActorName = ActorStore::UNKNOWN_USER_NAME;
-		if ( isset( $row->rev_actor ) ) {
+		if ( isset( $row->rev_actor ) && $row->rev_actor !== '0' ) {
 			$revActorName = $userFactory->newFromActorId( $row->rev_actor )->getName();
 		}
 
@@ -385,7 +385,7 @@ class Article {
 	 * Reset the headings to their initial state.
 	 * Ideally this Article class should not exist and be handled by the built in MediaWiki class.
 	 */
-	public static function resetHeadings() {
+	public static function resetHeadings(): void {
 		self::$headings = [];
 	}
 

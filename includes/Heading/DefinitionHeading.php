@@ -73,7 +73,7 @@ class DefinitionHeading extends Heading {
 	 * @param Lister $lister
 	 * @return string
 	 */
-	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ) {
+	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ): string {
 		$item = '';
 
 		$item .= $this->headListStart . $headingLink;
