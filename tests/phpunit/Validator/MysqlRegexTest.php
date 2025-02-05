@@ -15,6 +15,8 @@ class MysqlRegexTest extends TestCase {
 		$this->assertTrue( $validator->isValid( 'text{1,2}text' ) );
 		$this->assertTrue( $validator->isValid( '^P{1,2}' ) );
 		$this->assertTrue( $validator->isValid( '^P{1,2}P' ) );
+		$this->assertTrue( $validator->isValid( '^P{1}' ) );
+		$this->assertTrue( $validator->isValid( 'k{5,}' ) );
 
 		// Test invalid cases
 		$this->assertFalse( $validator->isValid( '{1,2' ) );
