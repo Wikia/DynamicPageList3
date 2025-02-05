@@ -502,6 +502,7 @@ class Parse {
 				continue;
 			}
 
+			$option = str_replace( [ "{", "}" ], "", $option );
 			// Ignore parameter settings without argument (except namespace and category).
 			if ( !strlen( $option ) ) {
 				if ( $parameter != 'namespace' && $parameter != 'notnamespace' && $parameter != 'category' && $this->parameters->exists( $parameter ) ) {
