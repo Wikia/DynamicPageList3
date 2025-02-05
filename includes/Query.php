@@ -1256,6 +1256,10 @@ class Query {
 	private function _imageused( $option ): void {
 		$where = [];
 
+		if ( $this->parameters->getParameter( 'distinct' ) == 'strict' ) {
+			$this->addGroupBy( 'page_title' );
+		}
+
 		$this->addTable( 'imagelinks', 'il' );
 		$this->addSelect(
 			[
