@@ -5,6 +5,7 @@ namespace MediaWiki\Extension\DynamicPageList3;
 use ExtVariables;
 use MediaWiki\Extension\DynamicPageList3\Heading\Heading;
 use MediaWiki\Extension\DynamicPageList3\Lister\Lister;
+use MediaWiki\Extension\DynamicPageList3\Validator\MysqlRegex;
 use MediaWiki\MediaWikiServices;
 use MWException;
 use Parser;
@@ -502,7 +503,10 @@ class Parse {
 				continue;
 			}
 
-			$option = str_replace( [ "{", "}" ], "", $option );
+			$isCorrect = $this->validateOption( $option );
+			if ( !$isCorrect ) {
+				$option = str_replace( [ "{", "}" ], [ "\\{", "\\}" ], $option );
+			}
 			// Ignore parameter settings without argument (except namespace and category).
 			if ( !strlen( $option ) ) {
 				if ( $parameter != 'namespace' && $parameter != 'notnamespace' && $parameter != 'category' && $this->parameters->exists( $parameter ) ) {
@@ -514,6 +518,10 @@ class Parse {
 		}
 
 		return $parameters;
+	}
+
+	private function validateOption( string $option ): bool {
+		return ( new MysqlRegex() )->isValid( $option );
 	}
 
 	/**
