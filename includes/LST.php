@@ -705,7 +705,7 @@ class LST {
 				}
 			} else {
 				// put a red link into the output
-				$output[0] = self::callParserPreprocess( $parser, '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' .	$title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
+				$output[0] = self::callParserPreprocess( $parser, '{{' . $defaultTemplate . '|%PAGE%=' . $page . '|%TITLE%=' . $title->getText() . '|%DATE%=' . $date . '|%USER%=' . $user . '}}', $parser->getPage(), $parser->getOptions() );
 			}
 
 			unset( $title );
