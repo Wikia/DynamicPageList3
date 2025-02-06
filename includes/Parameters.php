@@ -2,12 +2,12 @@
 
 namespace MediaWiki\Extension\DynamicPageList3;
 
-use MediaWiki\Context\RequestContext;
 use MediaWiki\MediaWikiServices;
-use MediaWiki\Title\Title;
 use MWException;
 use PermissionsError;
+use RequestContext;
 use StringUtils;
+use Title;
 
 class Parameters extends ParametersData {
 	/**

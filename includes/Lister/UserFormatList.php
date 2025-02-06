@@ -4,7 +4,7 @@ namespace MediaWiki\Extension\DynamicPageList3\Lister;
 
 use MediaWiki\Extension\DynamicPageList3\Article;
 use MediaWiki\Extension\DynamicPageList3\Parameters;
-use MediaWiki\Parser\Parser;
+use Parser;
 
 class UserFormatList extends Lister {
 	/**
