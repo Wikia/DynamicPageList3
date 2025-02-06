@@ -10,7 +10,7 @@ class Logger {
 	 */
 	private $buffer = [];
 
-	public function addMessage(): void {
+	public function addMessage() {
 		$args = func_get_args();
 		$args = array_map( 'htmlspecialchars', $args );
 
@@ -37,7 +37,7 @@ class Logger {
 	 * Get a message, with optional parameters
 	 * Parameters from user input must be escaped for HTML *before* passing to this function
 	 */
-	public function msg(): void {
+	public function msg() {
 		$args = func_get_args();
 		$errorId = array_shift( $args );
 		$errorLevel = floor( $errorId / 1000 );

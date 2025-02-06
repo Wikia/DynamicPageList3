@@ -200,7 +200,7 @@ class Parameters extends ParametersData {
 	 * @param array	$parameters
 	 * @return array
 	 */
-	public static function sortByPriority( $parameters ): array {
+	public static function sortByPriority( $parameters ) {
 		if ( !is_array( $parameters ) ) {
 			throw new MWException( __METHOD__ . ': A non-array was passed.' );
 		}
@@ -239,7 +239,7 @@ class Parameters extends ParametersData {
 	 * @param bool $found
 	 * @return void
 	 */
-	private function setSelectionCriteriaFound( bool $found = true ): void {
+	private function setSelectionCriteriaFound( $found = true ) {
 		if ( !is_bool( $found ) ) {
 			throw new MWException( __METHOD__ . ': A non-boolean was passed.' );
 		}
@@ -262,7 +262,7 @@ class Parameters extends ParametersData {
 	 * @param bool $conflict
 	 * @return void
 	 */
-	private function setOpenReferencesConflict( bool $conflict = true ): void {
+	private function setOpenReferencesConflict( $conflict = true ) {
 		if ( !is_bool( $conflict ) ) {
 			throw new MWException( __METHOD__ . ': A non-boolean was passed.' );
 		}
@@ -282,7 +282,7 @@ class Parameters extends ParametersData {
 	/**
 	 * Set default parameters based on ParametersData.
 	 */
-	private function setDefaults(): void {
+	private function setDefaults() {
 		$this->setParameter( 'defaulttemplatesuffix', '.default' );
 
 		$parameters = $this->getParametersForRichness();
@@ -303,7 +303,7 @@ class Parameters extends ParametersData {
 	 * @param string $parameter
 	 * @param mixed	$option
 	 */
-	public function setParameter( $parameter, $option ): void {
+	public function setParameter( $parameter, $option ) {
 		$this->parameterOptions[$parameter] = $option;
 	}
 
@@ -322,7 +322,7 @@ class Parameters extends ParametersData {
 	 *
 	 * @return array
 	 */
-	public function getAllParameters(): array {
+	public function getAllParameters() {
 		return self::sortByPriority( $this->parameterOptions );
 	}
 
@@ -332,7 +332,7 @@ class Parameters extends ParametersData {
 	 * @param int|string|bool $boolean
 	 * @return bool
 	 */
-	public function filterBoolean( $boolean ): ?bool {
+	public function filterBoolean( $boolean ) {
 		return filter_var( $boolean, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
 	}
 
@@ -342,7 +342,7 @@ class Parameters extends ParametersData {
 	 * @param string $text
 	 * @return string
 	 */
-	private function stripHtmlTags( $text ): array|string|null {
+	private function stripHtmlTags( $text ) {
 		$text = preg_replace( "#<.*?html.*?>#is", "", $text );
 
 		return $text;
@@ -355,7 +355,7 @@ class Parameters extends ParametersData {
 	 * @param bool $mustExist
 	 * @return array|bool
 	 */
-	private function getPageNameList( $text, bool $mustExist = true ): false|array {
+	private function getPageNameList( $text, $mustExist = true ) {
 		$list = [];
 		$pages = explode( '|', trim( $text ) );
 
@@ -390,7 +390,7 @@ class Parameters extends ParametersData {
 	 * @param bool $forDb
 	 * @return bool
 	 */
-	private function isRegexValid( $regexes, bool $forDb = false ): bool {
+	private function isRegexValid( $regexes, $forDb = false ) {
 		foreach ( (array)$regexes as $regex ) {
 			if ( empty( trim( $regex ) ) ) {
 				continue;
@@ -414,7 +414,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _category( $option ): bool {
+	public function _category( $option ) {
 		$option = trim( $option );
 
 		if ( empty( $option ) ) {
@@ -529,7 +529,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _categoryregexp( $option ): bool {
+	public function _categoryregexp( $option ) {
 		if ( !$this->isRegexValid( $option, true ) ) {
 			return false;
 		}
@@ -551,7 +551,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _categorymatch( $option ): bool {
+	public function _categorymatch( $option ) {
 		if ( strpos( $option, '|' ) !== false ) {
 			$newMatches = explode( '|', $option );
 			$operator = 'OR';
@@ -579,7 +579,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _notcategory( $option ): bool {
+	public function _notcategory( $option ) {
 		$title = Title::newFromText( $option );
 
 		if ( $title !== null ) {
@@ -601,7 +601,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _notcategoryregexp( $option ): bool {
+	public function _notcategoryregexp( $option ) {
 		if ( !$this->isRegexValid( $option, true ) ) {
 			return false;
 		}
@@ -621,7 +621,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _notcategorymatch( $option ): bool {
+	public function _notcategorymatch( $option ) {
 		$data = $this->getParameter( 'notcategory' );
 
 		if ( !is_array( $data['like'] ?? false ) ) {
@@ -643,7 +643,7 @@ class Parameters extends ParametersData {
 	 * @param string|int $option
 	 * @return bool
 	 */
-	public function _count( $option ): bool {
+	public function _count( $option ) {
 		if ( $option > 0 ) {
 			$max = Config::getSetting( 'maxResultCount' );
 
@@ -665,7 +665,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _namespace( $option ): bool {
+	public function _namespace( $option ) {
 		$contLang = MediaWikiServices::getInstance()->getContentLanguage();
 
 		$extraParams = explode( '|', $option );
@@ -695,7 +695,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _notnamespace( $option ): bool {
+	public function _notnamespace( $option ) {
 		$contLang = MediaWikiServices::getInstance()->getContentLanguage();
 
 		$extraParams = explode( '|', $option );
@@ -725,7 +725,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _openreferences( $option ): bool {
+	public function _openreferences( $option ) {
 		if ( $option !== 'missing' ) {
 			$option = $this->filterBoolean( $option );
 		}
@@ -747,7 +747,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _ordermethod( $option ): bool {
+	public function _ordermethod( $option ) {
 		$methods = explode( ',', $option );
 
 		foreach ( $methods as $method ) {
@@ -770,7 +770,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _mode( $option ): bool {
+	public function _mode( $option ) {
 		if ( in_array( $option, $this->getData( 'mode' )['values'] ) ) {
 			// 'none' mode is implemented as a specific submode of 'inline' with <br/> as inline text
 			if ( $option == 'none' ) {
@@ -796,7 +796,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _distinct( $option ): bool {
+	public function _distinct( $option ) {
 		$boolean = $this->filterBoolean( $option );
 
 		if ( $option == 'strict' ) {
@@ -816,7 +816,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _ordercollation( $option ): bool {
+	public function _ordercollation( $option ) {
 		if ( $option == 'bridge' ) {
 			$this->setParameter( 'ordersuitsymbols', true );
 		} elseif ( !empty( $option ) ) {
@@ -833,7 +833,7 @@ class Parameters extends ParametersData {
 	 *
 	 * @return mixed
 	 */
-	public function _listseparators(): mixed {
+	public function _listseparators() {
 		return call_user_func_array( [ $this, '_format' ], func_get_args() );
 	}
 
@@ -843,7 +843,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _format( $option ): bool {
+	public function _format( $option ) {
 		// Parsing of wikitext will happen at the end of the output phase. Replace '\n' in the input by linefeed because wiki syntax depends on linefeeds.
 		$option = $this->stripHtmlTags( $option );
 		$option = Parse::replaceNewLines( $option );
@@ -863,7 +863,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _title( $option ): bool {
+	public function _title( $option ) {
 		$title = Title::newFromText( $option );
 
 		if ( $title ) {
@@ -893,7 +893,7 @@ class Parameters extends ParametersData {
 	 * @param string|int $option
 	 * @return bool
 	 */
-	public function _titlemaxlength( $option ): bool {
+	public function _titlemaxlength( $option ) {
 		$this->setParameter( 'titlemaxlen', intval( $option ) );
 
 		return true;
@@ -905,7 +905,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _titleregexp( $option ): bool {
+	public function _titleregexp( $option ) {
 		$data = $this->getParameter( 'title' );
 
 		if ( !is_array( $data['regexp'] ?? false ) ) {
@@ -932,7 +932,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _titlematch( $option ): bool {
+	public function _titlematch( $option ) {
 		$data = $this->getParameter( 'title' );
 
 		if ( !is_array( $data['like'] ?? false ) ) {
@@ -954,7 +954,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _nottitleregexp( $option ): bool {
+	public function _nottitleregexp( $option ) {
 		$data = $this->getParameter( 'nottitle' );
 
 		if ( !is_array( $data['regexp'] ) ) {
@@ -980,7 +980,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _nottitlematch( $option ): bool {
+	public function _nottitlematch( $option ) {
 		$data = $this->getParameter( 'nottitle' );
 
 		if ( !is_array( $data['like'] ?? false ) ) {
@@ -1002,7 +1002,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _scroll( $option ): bool {
+	public function _scroll( $option ) {
 		$option = $this->filterBoolean( $option );
 		$this->setParameter( 'scroll', $option );
 
@@ -1045,7 +1045,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _replaceintitle( $option ): bool {
+	public function _replaceintitle( $option ) {
 		// We offer a possibility to replace some part of the title
 		$replaceInTitle = explode( ',', $option, 2 );
 
@@ -1064,7 +1064,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _debug( $option ): bool {
+	public function _debug( $option ) {
 		if ( in_array( $option, $this->getData( 'debug' )['values'] ) ) {
 			Hooks::setDebugLevel( $option );
 		} else {
@@ -1079,7 +1079,7 @@ class Parameters extends ParametersData {
 	 *
 	 * @return mixed
 	 */
-	public function _includepage(): mixed {
+	public function _includepage() {
 		return call_user_func_array( [ $this, '_include' ], func_get_args() );
 	}
 
@@ -1089,7 +1089,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _include( $option ): bool {
+	public function _include( $option ) {
 		if ( !empty( $option ) ) {
 			$this->setParameter( 'incpage', true );
 			$this->setParameter( 'seclabels', explode( ',', $option ) );
@@ -1106,7 +1106,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _includematch( $option ): bool {
+	public function _includematch( $option ) {
 		$regexes = explode( ',', $option );
 
 		if ( !$this->isRegexValid( $regexes ) ) {
@@ -1124,7 +1124,7 @@ class Parameters extends ParametersData {
 	 * @param string|int $option
 	 * @return bool
 	 */
-	public function _includemaxlength( $option ): bool {
+	public function _includemaxlength( $option ) {
 		$this->setParameter( 'includemaxlen', intval( $option ) );
 
 		return true;
@@ -1136,7 +1136,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _includematchparsed( $option ): bool {
+	public function _includematchparsed( $option ) {
 		$regexes = explode( ',', $option );
 
 		if ( !$this->isRegexValid( $regexes ) ) {
@@ -1155,7 +1155,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _includenotmatch( $option ): bool {
+	public function _includenotmatch( $option ) {
 		$regexes = explode( ',', $option );
 
 		if ( !$this->isRegexValid( $regexes ) ) {
@@ -1173,7 +1173,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _includenotmatchparsed( $option ): bool {
+	public function _includenotmatchparsed( $option ) {
 		$regexes = explode( ',', $option );
 
 		if ( !$this->isRegexValid( $regexes ) ) {
@@ -1192,7 +1192,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _secseparators( $option ): bool {
+	public function _secseparators( $option ) {
 		// We replace '\n' by newline to support wiki syntax within the section separators
 		$this->setParameter( 'secseparators', explode( ',', Parse::replaceNewLines( $option ) ) );
 
@@ -1205,7 +1205,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _multisecseparators( $option ): bool {
+	public function _multisecseparators( $option ) {
 		// We replace '\n' by newline to support wiki syntax within the section separators
 		$this->setParameter( 'multisecseparators', explode( ',', Parse::replaceNewLines( $option ) ) );
 
@@ -1218,7 +1218,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _table( $option ): bool {
+	public function _table( $option ) {
 		$this->setParameter( 'defaulttemplatesuffix', '' );
 		$this->setParameter( 'mode', 'userformat' );
 		$this->setParameter( 'inlinetext', '' );
@@ -1293,7 +1293,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _tablerow( $option ): bool {
+	public function _tablerow( $option ) {
 		$option = Parse::replaceNewLines( trim( $option ) );
 
 		if ( empty( $option ) ) {
@@ -1312,7 +1312,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool|int|string
 	 */
-	public function _allowcachedresults( $option ): bool {
+	public function _allowcachedresults( $option ) {
 		// If execAndExit was previously set (i.e. if it is not empty) we will ignore all cache settings which are placed AFTER the execandexit statement thus we make sure that the cache will only become invalid if the query is really executed.
 		if ( $this->getParameter( 'execandexit' ) === null ) {
 			if ( $option === 'yes+warn' ) {
@@ -1341,7 +1341,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _fixcategory( $option ): bool {
+	public function _fixcategory( $option ) {
 		Hooks::fixCategory( $option );
 
 		return true;
@@ -1353,7 +1353,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _reset( $option ): bool {
+	public function _reset( $option ) {
 		$arguments = explode( ',', $option );
 		$reset = [];
 
@@ -1396,7 +1396,7 @@ class Parameters extends ParametersData {
 	 * @param string $option
 	 * @return bool
 	 */
-	public function _eliminate( $option ): bool {
+	public function _eliminate( $option ) {
 		$arguments = explode( ',', $option );
 		$eliminate = [];
 

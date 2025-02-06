@@ -5,7 +5,6 @@ namespace MediaWiki\Extension\DynamicPageList3;
 use Article;
 use MediaWiki\CommentStore\CommentStoreComment;
 use MediaWiki\Context\RequestContext;
-use MediaWiki\MainConfigNames;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Revision\SlotRecord;
 use MediaWiki\Title\Title;
@@ -26,7 +25,7 @@ class UpdateArticle {
 	 * @param string $rulesText
 	 * @return string
 	 */
-	public static function updateArticleByRule( $title, $text, $rulesText ): string {
+	public static function updateArticleByRule( $title, $text, $rulesText ) {
 		// we use ; as command delimiter; \; stands for a semicolon
 		// \n is translated to a real linefeed
 		$rulesText = str_replace( ";", '°', $rulesText );
@@ -358,8 +357,7 @@ class UpdateArticle {
 		if ( $exec == 'set' ) {
 			return self::doUpdateArticle( $title, $text, $summary );
 		} elseif ( $exec == 'preview' ) {
-			$config = MediaWikiServices::getInstance()->getMainConfig();
-			$scriptPath = $config->get( MainConfigNames::ScriptPath );
+			global $wgScriptPath;
 
 			$request = RequestContext::getMain()->getRequest();
 
@@ -369,7 +367,7 @@ class UpdateArticle {
 			$userOptionsLookup = MediaWikiServices::getInstance()->getUserOptionsLookup();
 
 			$form = '<html>
-	<form id="editform" name="editform" method="post" action="' . $scriptPath . '/index.php?title=' . urlencode( $title ) . '&action=submit" enctype="multipart/form-data">
+	<form id="editform" name="editform" method="post" action="' . $wgScriptPath . '/index.php?title=' . urlencode( $title ) . '&action=submit" enctype="multipart/form-data">
 		<input type="hidden" value="" name="wpSection" />
 		<input type="hidden" value="' . wfTimestampNow() . '" name="wpStarttime" />
 		<input type="hidden" value="' . $articleX->getPage()->getTimestamp() . '" name="wpEdittime" />
@@ -393,7 +391,7 @@ class UpdateArticle {
 	 * @param string $summary
 	 * @return string
 	 */
-	private static function doUpdateArticle( $title, $text, string $summary ): string {
+	private static function doUpdateArticle( $title, $text, $summary ) {
 		$context = RequestContext::getMain();
 		$out = $context->getOutput();
 		$user = $context->getUser();
@@ -443,7 +441,7 @@ class UpdateArticle {
 	 * @param string $fieldFormat
 	 * @return string
 	 */
-	private static function editTemplateCall( int|string $call, string $parameter, $type, $value, string $format, string|array|null $legend, $instruction, string $fieldFormat ): string {
+	private static function editTemplateCall( $call, $parameter, $type, $value, $format, $legend, $instruction, $fieldFormat ) {
 		$matches = [];
 		$nlCount = preg_match_all( '/\n/', $value, $matches );
 
@@ -472,7 +470,7 @@ class UpdateArticle {
 	 * @param string $template
 	 * @return array|string
 	 */
-	private static function getTemplateParmValues( $text, string $template ): string|array {
+	private static function getTemplateParmValues( $text, $template ) {
 		$matches = [];
 		$noMatches = preg_match_all( '/\{\{\s*' . preg_quote( $template, '/' ) . '\s*[|}]/i', $text, $matches, PREG_OFFSET_CAPTURE );
 
@@ -558,7 +556,7 @@ class UpdateArticle {
 	 * @param bool $optional
 	 * @return string
 	 */
-	private static function updateTemplateCall( &$matchCount, $text, string $template, int $call, string $parameter, $value, array $afterParm, bool $optional ) {
+	private static function updateTemplateCall( &$matchCount, $text, $template, $call, $parameter, $value, $afterParm, $optional ) {
 		// if parameter is optional and value is empty we leave everything as it is (i.e. we do not remove the parm)
 		if ( $optional && $value == '' ) {
 			return $text;
@@ -703,7 +701,7 @@ class UpdateArticle {
 	 * @param string $rulesText
 	 * @return string
 	 */
-	public static function deleteArticleByRule( $title, $text, $rulesText ): string {
+	public static function deleteArticleByRule( $title, $text, $rulesText ) {
 		// return "deletion of articles by DPL is disabled.";
 
 		// we use ; as command delimiter; \; stands for a semicolon

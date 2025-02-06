@@ -22,7 +22,7 @@ class CategoryList extends Lister {
 	 * @param int $count
 	 * @return string Formatted list.
 	 */
-	public function formatList( $articles, $start, $count ): string {
+	public function formatList( $articles, $start, $count ) {
 		$articleLinks = [];
 		$articleStartChars = [];
 
@@ -54,7 +54,7 @@ class CategoryList extends Lister {
 	 * @param string|null $pageText
 	 * @return string
 	 */
-	public function formatItem( Article $article, $pageText = null ): string {
+	public function formatItem( Article $article, $pageText = null ) {
 		return '';
 	}
 }

@@ -94,7 +94,7 @@ class Hooks {
 	 *
 	 * @param Parser $parser
 	 */
-	public static function onParserFirstCallInit( Parser $parser ): void {
+	public static function onParserFirstCallInit( Parser $parser ) {
 		self::init();
 
 		// DPL offers the same functionality as Intersection. So we register the <DynamicPageList> tag in case LabeledSection Extension is not installed so that the section markers are removed.
@@ -118,7 +118,7 @@ class Hooks {
 	 *
 	 * @param Parser $parser
 	 */
-	public static function setupMigration( Parser $parser ): void {
+	public static function setupMigration( Parser $parser ) {
 		$parser->setHook( 'Intersection', [ __CLASS__, 'intersectionTag' ] );
 		$parser->addTrackingCategory( 'dpl-intersection-tracking-category' );
 
@@ -128,7 +128,7 @@ class Hooks {
 	/**
 	 * Common initializer for usage from parser entry points.
 	 */
-	private static function init(): void {
+	private static function init() {
 		Config::init();
 
 		if ( !isset( self::$createdLinks ) ) {
@@ -148,7 +148,7 @@ class Hooks {
 	 *
 	 * @param bool $mode
 	 */
-	private static function setLikeIntersection( bool $mode = false ): void {
+	private static function setLikeIntersection( $mode = false ) {
 		self::$likeIntersection = $mode;
 	}
 
@@ -157,7 +157,7 @@ class Hooks {
 	 *
 	 * @return bool
 	 */
-	public static function isLikeIntersection(): bool {
+	public static function isLikeIntersection() {
 		return (bool)self::$likeIntersection;
 	}
 
@@ -239,7 +239,8 @@ class Hooks {
 
 		$parsedDPL = $parser->recursiveTagParse( $text );
 		if ( $reset['templates'] ?? false ) {
-			$parser->getOutput()->mTemplates = $saveTemplates ?? [];
+			$outputTemplates = $parser->getOutput()->getTemplates();
+			$outputTemplates = $saveTemplates ?? [];
 		}
 
 		if ( $reset['categories'] ?? false ) {
@@ -247,7 +248,8 @@ class Hooks {
 		}
 
 		if ( $reset['images'] ?? false ) {
-			$parser->getOutput()->mImages = $saveImages ?? [];
+			$outputImages = $parser->getOutput()->getImages();
+			$outputImages = $saveImages ?? [];
 		}
 
 		return $parsedDPL;
@@ -255,8 +257,11 @@ class Hooks {
 
 	/**
 	 * The #dpl parser tag entry point.
+	 *
+	 * @param Parser $parser
+	 * @return array|string
 	 */
-	public static function dplParserFunction( Parser $parser ): array|string {
+	public static function dplParserFunction( $parser ) {
 		self::setLikeIntersection( false );
 
 		$parser->addTrackingCategory( 'dpl-parserfunc-tracking-category' );
@@ -293,8 +298,12 @@ class Hooks {
 	/**
 	 * The #dplnum parser tag entry point.
 	 * From the old documentation: "Tries to guess a number that is buried in the text. Uses a set of heuristic rules which may work or not. The idea is to extract the number so that it can be used as a sorting value in the column of a DPL table output."
+	 *
+	 * @param Parser $parser
+	 * @param string $text
+	 * @return string
 	 */
-	public static function dplNumParserFunction( Parser $parser, string $text = '' ): string {
+	public static function dplNumParserFunction( $parser, $text = '' ) {
 		$parser->addTrackingCategory( 'dplnum-parserfunc-tracking-category' );
 
 		$num = str_replace( '&#160;', ' ', $text );
@@ -315,7 +324,12 @@ class Hooks {
 		return $num;
 	}
 
-	public static function dplVarParserFunction( Parser $parser, string $cmd ): string {
+	/**
+	 * @param Parser &$parser
+	 * @param string $cmd
+	 * @return string
+	 */
+	public static function dplVarParserFunction( &$parser, $cmd ) {
 		$parser->addTrackingCategory( 'dplvar-parserfunc-tracking-category' );
 		$args = func_get_args();
 
@@ -332,7 +346,7 @@ class Hooks {
 	 * @param string $needle
 	 * @return bool
 	 */
-	private static function isRegexp( string $needle ): bool {
+	private static function isRegexp( $needle ) {
 		if ( strlen( $needle ) < 3 ) {
 			return false;
 		}
@@ -353,7 +367,14 @@ class Hooks {
 		return false;
 	}
 
-	public static function dplReplaceParserFunction( Parser $parser, string $text, string $pat = '', string $repl = '' ): string {
+	/**
+	 * @param Parser &$parser
+	 * @param string $text
+	 * @param string $pat
+	 * @param string $repl
+	 * @return string
+	 */
+	public static function dplReplaceParserFunction( &$parser, $text, $pat = '', $repl = '' ) {
 		$parser->addTrackingCategory( 'dplreplace-parserfunc-tracking-category' );
 		if ( $text == '' || $pat == '' ) {
 			return '';
@@ -378,7 +399,7 @@ class Hooks {
 	}
 
 	/**
-	 * @param Parser $parser
+	 * @param Parser &$parser
 	 * @param string $text
 	 * @param string $heading
 	 * @param int $maxLength
@@ -387,7 +408,7 @@ class Hooks {
 	 * @param bool $trim
 	 * @return string
 	 */
-	public static function dplChapterParserFunction( $parser, $text = '', $heading = ' ', $maxLength = -1, $page = '?page?', $link = 'default', $trim = false ) {
+	public static function dplChapterParserFunction( &$parser, $text = '', $heading = ' ', $maxLength = -1, $page = '?page?', $link = 'default', $trim = false ) {
 		$parser->addTrackingCategory( 'dplchapter-parserfunc-tracking-category' );
 		$output = LST::extractHeadingFromText( $parser, $page, '?title?', $text, $heading, '', $sectionHeading, true, $maxLength, $link, $trim );
 		return $output[0];
@@ -402,7 +423,7 @@ class Hooks {
 	 * @param string $matrix
 	 * @return string
 	 */
-	public static function dplMatrixParserFunction( &$parser, $name = '', $yes = '', $no = '', $flip = '', $matrix = '' ): string {
+	public static function dplMatrixParserFunction( &$parser, $name = '', $yes = '', $no = '', $flip = '', $matrix = '' ) {
 		$parser->addTrackingCategory( 'dplmatrix-parserfunc-tracking-category' );
 		$lines = explode( "\n", $matrix );
 		$m = [];
@@ -513,7 +534,7 @@ class Hooks {
 	/**
 	 * @param string $cat
 	 */
-	public static function fixCategory( $cat ): void {
+	public static function fixCategory( $cat ) {
 		if ( $cat != '' ) {
 			self::$fixedCategories[$cat] = 1;
 		}
@@ -524,7 +545,7 @@ class Hooks {
 	 *
 	 * @param int|string $level
 	 */
-	public static function setDebugLevel( $level ): void {
+	public static function setDebugLevel( $level ) {
 		self::$debugLevel = intval( $level );
 	}
 
@@ -543,7 +564,7 @@ class Hooks {
 	 * @param Parser $parser
 	 * @param string $text
 	 */
-	public static function endReset( $parser, $text ): void {
+	public static function endReset( $parser, $text ) {
 		if ( !self::$createdLinks['resetdone'] ) {
 			self::$createdLinks['resetdone'] = true;
 
@@ -590,7 +611,7 @@ class Hooks {
 	 * @param Parser $parser
 	 * @param string &$text
 	 */
-	public static function endEliminate( $parser, &$text ): void {
+	public static function endEliminate( $parser, &$text ) {
 		// called during the final output phase; removes links created by DPL
 		if ( isset( self::$createdLinks ) ) {
 			if ( array_key_exists( 0, self::$createdLinks ) ) {
@@ -647,7 +668,7 @@ class Hooks {
 	 *
 	 * @param DatabaseUpdater $updater
 	 */
-	public static function onLoadExtensionSchemaUpdates( DatabaseUpdater $updater ): void {
+	public static function onLoadExtensionSchemaUpdates( DatabaseUpdater $updater ) {
 		$updater->addPostDatabaseUpdateMaintenance( CreateTemplate::class );
 		$updater->addPostDatabaseUpdateMaintenance( CreateView::class );
 	}

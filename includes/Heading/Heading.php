@@ -68,9 +68,14 @@ class Heading {
 
 	/**
 	 * Parameters
+	 *
+	 * @var Parameters
 	 */
-	protected Parameters $parameters;
+	protected $parameters;
 
+	/**
+	 * @param Parameters $parameters
+	 */
 	public function __construct( Parameters $parameters ) {
 		$this->setListAttributes( $parameters->getParameter( 'hlistattr' ) );
 		$this->setItemAttributes( $parameters->getParameter( 'hitemattr' ) );
@@ -80,8 +85,12 @@ class Heading {
 
 	/**
 	 * Get a new List subclass based on user selection.
+	 *
+	 * @param string $style
+	 * @param Parameters $parameters
+	 * @return mixed
 	 */
-	public static function newFromStyle( string $style, Parameters $parameters ): ?Heading {
+	public static function newFromStyle( $style, Parameters $parameters ) {
 		$style = strtolower( $style );
 
 		switch ( $style ) {
@@ -115,7 +124,7 @@ class Heading {
 	 *
 	 * @return Parameters
 	 */
-	public function getParameters(): Parameters {
+	public function getParameters() {
 		return $this->parameters;
 	}
 
@@ -124,7 +133,7 @@ class Heading {
 	 *
 	 * @param string $attributes
 	 */
-	public function setListAttributes( $attributes ): void {
+	public function setListAttributes( $attributes ) {
 		$this->listAttributes = Sanitizer::fixTagAttributes( $attributes, 'ul' );
 	}
 
@@ -133,7 +142,7 @@ class Heading {
 	 *
 	 * @param string $attributes
 	 */
-	public function setItemAttributes( $attributes ): void {
+	public function setItemAttributes( $attributes ) {
 		$this->itemAttributes = Sanitizer::fixTagAttributes( $attributes, 'li' );
 	}
 
@@ -142,7 +151,7 @@ class Heading {
 	 *
 	 * @param bool $show
 	 */
-	public function setShowHeadingCount( $show = false ): void {
+	public function setShowHeadingCount( $show = false ) {
 		$this->showHeadingCount = boolval( $show );
 	}
 
@@ -162,7 +171,7 @@ class Heading {
 	 * @param Lister $lister
 	 * @return string
 	 */
-	public function format( $articles, Lister $lister ): string {
+	public function format( $articles, Lister $lister ) {
 		$columns = $this->getParameters()->getParameter( 'columns' );
 		$rows = $this->getParameters()->getParameter( 'rows' );
 		$rowSize = $this->getParameters()->getParameter( 'rowsize' );
@@ -345,7 +354,7 @@ class Heading {
 	 * @param Lister $lister
 	 * @return string
 	 */
-	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ): string {
+	public function formatItem( $headingStart, $headingCount, $headingLink, $articles, Lister $lister ) {
 		$item = '';
 
 		$item .= $this->getItemStart() . $headingLink;
@@ -365,7 +374,7 @@ class Heading {
 	 *
 	 * @return string
 	 */
-	public function getListStart(): string {
+	public function getListStart() {
 		return sprintf( $this->listStart, $this->listAttributes );
 	}
 
@@ -374,7 +383,7 @@ class Heading {
 	 *
 	 * @return string
 	 */
-	public function getItemStart(): string {
+	public function getItemStart() {
 		return sprintf( $this->itemStart, $this->itemAttributes );
 	}
 
@@ -393,7 +402,7 @@ class Heading {
 	 * @param int $count
 	 * @return string
 	 */
-	protected function articleCountMessage( $count ): string {
+	protected function articleCountMessage( $count ) {
 		$orderMethods = $this->getParameters()->getParameter( 'ordermethods' );
 
 		if ( isset( $orderMethods[0] ) && $orderMethods[0] === 'category' ) {
