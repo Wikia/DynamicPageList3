@@ -123,7 +123,7 @@ class LST {
 
 			// Handle recursion here, so we can break cycles.
 			if ( $recursionCheck == false ) {
-				$text = $parser->preprocess( $text, $parser->getPage(), $parser->getOptions() );
+				$text = self::callParserPreprocess( $parser, $text, $parser->getPage(), $parser->getOptions() );
 				self::close( $parser, $part1 );
 			}
 
