@@ -594,7 +594,7 @@ class LST {
 				}
 			}
 
-			if ( !$end_off ) {
+			if ( !isset( $end_off ) ) {
 				if ( $nr != 0 ) {
 					$pat = '^(={1,6})\s*[^\s\n=][^\n=]*\s*\1\s*$';
 				} else {
@@ -613,7 +613,7 @@ class LST {
 
 			wfDebug( "LSTH: head offset = $nhead" );
 
-			if ( $end_off ) {
+			if ( !empty( $end_off ) ) {
 				if ( $end_off == -1 ) {
 					return $output;
 				}
