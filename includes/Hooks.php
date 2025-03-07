@@ -226,8 +226,7 @@ class Hooks {
 		if ( $reset['categories'] ?? false ) {
 			$saveCategories = array_combine(
 				$parserOutput->getCategoryNames(),
-				array_map( static fn ( $value ) =>
-					$parserOutput->getCategorySortKey( $value ),
+				array_map( static fn ( $value ) => $parserOutput->getCategorySortKey( $value ),
 					$parserOutput->getCategoryNames()
 				)
 			);
@@ -628,13 +627,15 @@ class Hooks {
 						continue;
 					}
 
-					$parser->getOutput()->mLinks[$nsp] = array_diff_assoc(
-						$parserLinks[$nsp],
+					// @phan-suppress-next-line PhanDeprecatedFunction
+					$mLinks = $parser->getOutput()->getLinks();
+					$mLinks[$nsp] = array_diff_assoc(
+						$link,
 						self::$createdLinks[0][$nsp]
 					);
 
-					if ( count( $parserLinks[$nsp] ) == 0 ) {
-						unset( $parser->getOutput()->mLinks[$nsp] );
+					if ( count( $link ) == 0 ) {
+						unset( $mLinks[$nsp] );
 					}
 				}
 			}
@@ -646,13 +647,15 @@ class Hooks {
 						continue;
 					}
 
-					$parser->getOutput()->mTemplates[$nsp] = array_diff_assoc(
-						$parserTemplates[$nsp],
+					// @phan-suppress-next-line PhanDeprecatedFunction
+					$mTemplates = $parser->getOutput()->getTemplates();
+					$mTemplates[$nsp] = array_diff_assoc(
+						$tpl,
 						self::$createdLinks[1][$nsp]
 					);
 
-					if ( count( $parserTemplates[$nsp] ) == 0 ) {
-						unset( $parser->getOutput()->mTemplates[$nsp] );
+					if ( count( $tpl ) == 0 ) {
+						unset( $mTemplates[$nsp] );
 					}
 				}
 			}
