@@ -29,8 +29,13 @@ namespace MediaWiki\Extension\DynamicPageList3;
 
 use MediaWiki\Extension\DynamicPageList3\Lister\Lister;
 use MediaWiki\MediaWikiServices;
+use MediaWiki\Page\PageReference;
 use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\ParserOptions;
+use MediaWiki\Parser\StripState;
 use MediaWiki\Title\Title;
+use ReflectionClass;
+use ReflectionException;
 
 class LST {
 
@@ -594,7 +599,7 @@ class LST {
 				}
 			}
 
-			if ( !isset( $end_off ) ) {
+			if ( ( $end_off ?? null ) === null ) {
 				if ( $nr != 0 ) {
 					$pat = '^(={1,6})\s*[^\s\n=][^\n=]*\s*\1\s*$';
 				} else {
@@ -613,7 +618,7 @@ class LST {
 
 			wfDebug( "LSTH: head offset = $nhead" );
 
-			if ( !empty( $end_off ) ) {
+			if ( $end_off ?? false ) {
 				if ( $end_off == -1 ) {
 					return $output;
 				}
@@ -875,7 +880,10 @@ class LST {
 										)
 									)
 								) . '}}';
-							$output[++$n] = self::callParserPreprocess( $parser, $argChain, $parser->getPage(), $parser->getOptions() );
+
+							$output[++$n] = self::callParserPreprocess(
+								$parser, $argChain, $parser->getPage(), $parser->getOptions()
+							);
 						}
 						break;
 					}
@@ -1051,26 +1059,22 @@ class LST {
 	 *
 	 * Using Parser::recursivePreprocess() prevents the cache clear, and thus repetitive calls reuse the
 	 * previously generated template DOM which brings a decent performance improvement when called multiple times.
-	 *
-	 * @see https://fandom.atlassian.net/browse/PLATFORM-8725
-	 *
-	 * @param Parser $parser
-	 * @param string $text
-	 * @param ?\MediaWiki\Page\PageReference $page
-	 * @param \ParserOptions $options
-	 * @return string
 	 */
-	protected static function callParserPreprocess( Parser $parser, $text, $page, $options ): string {
-		global $wgDplUseRecursivePreprocess;
-		if ( $wgDplUseRecursivePreprocess ) {
+	protected static function callParserPreprocess(
+		Parser $parser,
+		string $text,
+		?PageReference $page,
+		ParserOptions $options
+	): string {
+		if ( Config::getSetting( 'recursivePreprocess' ) ) {
 			self::softResetParser( $parser );
 			$parser->setOutputType( OT_PREPROCESS );
-			$text = $parser->recursivePreprocess( $text );
 
+			$text = $parser->recursivePreprocess( $text );
 			return $text;
-		} else {
-			return $parser->preprocess( $text, $page, $options );
 		}
+
+		return $parser->preprocess( $text, $page, $options );
 	}
 
 	/**
@@ -1078,7 +1082,7 @@ class LST {
 	 */
 	private static function softResetParser( Parser $parser ): void {
 		self::setParserProperties( $parser, [
-			'mStripState' => new \StripState( $parser ),
+			'mStripState' => new StripState( $parser ),
 			'mIncludeSizes' => [
 				'post-expand' => 0,
 				'arg' => 0,
@@ -1094,11 +1098,12 @@ class LST {
 		foreach ( $properties as $property => $value ) {
 			if ( !array_key_exists( $property, $reflectionCache ) ) {
 				try {
-					$reflectionCache[$property] = ( new \ReflectionClass( Parser::class ) )->getProperty( $property );
-				} catch ( \ReflectionException ) {
+					$reflectionCache[$property] = ( new ReflectionClass( Parser::class ) )->getProperty( $property );
+				} catch ( ReflectionException $e ) {
 					$reflectionCache[$property] = null;
 				}
 			}
+
 			if ( $reflectionCache[$property] ) {
 				$reflectionCache[$property]->setValue( $parser, $value );
 			}
