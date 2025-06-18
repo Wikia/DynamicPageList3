@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
+        uses: styfle/cancel-workflow-action@85880fa0301c86cca9da44039ee3bb12d3bedbfa
         with:
           access_token: ${{ github.token }}
 
@@ -183,7 +183,7 @@ jobs:
 
       - name: Setup PHP Action
         if: ${{ matrix.stage == 'phan' }}
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@0f7f1d08e3e32076e51cae65eb0b0c871405b16e
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v2
@@ -275,7 +275,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ matrix.stage == 'coverage' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@18283e04ce6e62d37312384ff67231eb8fd56d24
         with:
           directory: /home/runner/cover
 
