@@ -2,9 +2,9 @@ name: Quibble and Phan
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   test:
@@ -13,11 +13,18 @@ jobs:
     strategy:
       matrix:
         include:
-          # Latest stable MediaWiki - PHP 8.1 (phan)
+          # Latest MediaWiki LTS - PHP 8.1 (phan)
           - mw: 'REL1_43'
             php: 8.1
             php-docker: 81
             experimental: false
+            stage: phan
+
+          # Latest stable MediaWiki - PHP 8.1 (phan)
+          - mw: 'REL1_44'
+            php: 8.1
+            php-docker: 81
+            experimental: true
             stage: phan
 
           # Latest MediaWiki master - PHP 8.1 (phan)
@@ -27,15 +34,22 @@ jobs:
             experimental: true
             stage: phan
 
-          # Latest MediaWiki master - PHP 7.4 (coverage)
+          # Latest MediaWiki master - PHP 8.1 (coverage)
           - mw: 'master'
-            php: 7.4
-            php-docker: 74
+            php: 8.1
+            php-docker: 81
             experimental: false
             stage: coverage
 
-          # Latest stable MediaWiki - PHP 8.1 (phpunit)
+          # Latest MediaWiki LTS - PHP 8.1 (phpunit)
           - mw: 'REL1_43'
+            php: 8.1
+            php-docker: 81
+            experimental: false
+            stage: phpunit
+            
+          # Latest stable MediaWiki - PHP 8.1 (phpunit)
+          - mw: 'REL1_44'
             php: 8.1
             php-docker: 81
             experimental: false
@@ -74,8 +88,8 @@ jobs:
     env:
       DOCKER_REGISTRY: docker-registry.wikimedia.org
       DOCKER_ORG: releng
-      QUIBBLE_DOCKER_IMAGE: quibble-buster-php${{ matrix.php-docker }}
-      COVERAGE_DOCKER_IMAGE: quibble-buster-php${{ matrix.php-docker }}-coverage
+      QUIBBLE_DOCKER_IMAGE: quibble-bullseye-php${{ matrix.php-docker }}
+      COVERAGE_DOCKER_IMAGE: quibble-bullseye-php${{ matrix.php-docker }}-coverage
       PHAN_DOCKER_IMAGE: mediawiki-phan-php${{ matrix.php-docker }}
       MEDIAWIKI_VERSION: ${{ matrix.mw }}
 
@@ -121,7 +135,7 @@ jobs:
             curl -sL https://raw.githubusercontent.com/wikimedia/integration-config/master/zuul/dependencies.yaml -o dependencies.yaml
             curl -sL https://raw.githubusercontent.com/wikimedia/integration-config/master/zuul/phan_dependencies.yaml -o phan_dependencies.yaml
             curl -sL https://raw.githubusercontent.com/wikimedia/integration-config/master/zuul/parameter_functions.py -o pf.py
-            curl -sL https://raw.githubusercontent.com/miraheze/ci-scripts/master/mediawiki/resolve_dependencies.py -o rd.py
+            curl -sL https://raw.githubusercontent.com/miraheze/ci-scripts/main/mediawiki/resolve_dependencies.py -o rd.py
             if [ -e dependencies ]; then
               echo "DEPENDENCIES=$(python3 rd.py dependencies)" >> $GITHUB_ENV
             fi
