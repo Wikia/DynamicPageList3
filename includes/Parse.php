@@ -30,13 +30,6 @@ class Parse {
 	private $logger = null;
 
 	/**
-	 * Array of prequoted table names.
-	 *
-	 * @var string[]
-	 */
-	private $tableNames = [];
-
-	/**
 	 * Header Output
 	 *
 	 * @var string
@@ -87,7 +80,6 @@ class Parse {
 	public function __construct() {
 		$this->parameters = new Parameters();
 		$this->logger = new Logger();
-		$this->tableNames = Query::getTableNames();
 		$this->request = RequestContext::getMain()->getRequest();
 	}
 
@@ -721,8 +713,8 @@ class Parse {
 
 		$totalCategories = 0;
 		if ( is_array( $this->parameters->getParameter( 'category' ) ) ) {
-			foreach ( $this->parameters->getParameter( 'category' ) as $comparisonType => $operatorTypes ) {
-				foreach ( $operatorTypes as $operatorType => $categoryGroups ) {
+			foreach ( $this->parameters->getParameter( 'category' ) as $operatorTypes ) {
+				foreach ( $operatorTypes as $categoryGroups ) {
 					foreach ( $categoryGroups as $categories ) {
 						if ( is_array( $categories ) ) {
 							$totalCategories += count( $categories );
@@ -733,8 +725,8 @@ class Parse {
 		}
 
 		if ( is_array( $this->parameters->getParameter( 'notcategory' ) ) ) {
-			foreach ( $this->parameters->getParameter( 'notcategory' ) as $comparisonType => $operatorTypes ) {
-				foreach ( $operatorTypes as $operatorType => $categories ) {
+			foreach ( $this->parameters->getParameter( 'notcategory' ) as $operatorTypes ) {
+				foreach ( $operatorTypes as $categories ) {
 					if ( is_array( $categories ) ) {
 						$totalCategories += count( $categories );
 					}
@@ -1177,8 +1169,7 @@ class Parse {
 		asort( $sortKeys );
 
 		$sortedArticles = [];
-
-		foreach ( $sortKeys as $oldKey => $newKey ) {
+		foreach ( $sortKeys as $oldKey => $_ ) {
 			$sortedArticles[] = $articles[$oldKey];
 		}
 
