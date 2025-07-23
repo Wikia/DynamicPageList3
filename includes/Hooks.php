@@ -219,7 +219,7 @@ class Hooks {
 
 		// we can remove the templates by save/restore
 		if ( $reset['templates'] ?? false ) {
-			$saveTemplates = $parserOutput->mTemplates;
+			$saveTemplates = $parserOutput->getLinkList( ParserOutputLinkTypes::TEMPLATE );
 		}
 
 		// we can remove the categories by save/restore
@@ -234,7 +234,7 @@ class Hooks {
 
 		// we can remove the images by save/restore
 		if ( $reset['images'] ?? false ) {
-			$saveImages = $parserOutput->mImages;
+			$saveImages = $parserOutput->getLinkList( ParserOutputLinkTypes::MEDIA );
 		}
 
 		$parsedDPL = $parser->recursiveTagParse( $text );
@@ -619,13 +619,13 @@ class Hooks {
 		// called during the final output phase; removes links created by DPL
 		if ( self::$createdLinks ) {
 			if ( array_key_exists( 0, self::$createdLinks ) ) {
-				$parserLinks = $parser->getOutput()->mLinks;
-				foreach ( $parserLinks as $nsp => $_ ) {
+				$parserLinks = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::LOCAL );
+				foreach ( $parserLinks as $nsp => $link ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[0] ) ) {
 						continue;
 					}
 
-					$mLinks = $parser->getOutput()->mLinks;
+					$mLinks = $parser->getOutput()->GetLinks();
 					$mLinks[$nsp] = array_diff_assoc(
 						$link,
 						self::$createdLinks[0][$nsp]
@@ -638,13 +638,13 @@ class Hooks {
 			}
 
 			if ( array_key_exists( 1, self::$createdLinks ) ) {
-				$parserTemplates = $parser->getOutput()->mTemplates;
-				foreach ( $parserTemplates as $nsp => $_ ) {
+				$parserTemplates = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::TEMPLATE );
+				foreach ( $parserTemplates as $nsp => $tpl ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[1] ) ) {
 						continue;
 					}
 
-					$mTemplates = $parser->getOutput()->mTemplates;
+					$mTemplates = $parser->getOutput()->getTemplates();
 					$mTemplates[$nsp] = array_diff_assoc(
 						$tpl,
 						self::$createdLinks[1][$nsp]
@@ -669,7 +669,8 @@ class Hooks {
 			}
 
 			if ( array_key_exists( 3, self::$createdLinks ) ) {
-				$parser->getOutput()->mImages = array_diff_assoc( $parser->getOutput()->mImages, self::$createdLinks[3] );
+				$parserMedia = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::MEDIA );
+				$parser->getOutput()->mImages = array_diff_assoc( $parserMedia, self::$createdLinks[3] );
 			}
 		}
 	}
