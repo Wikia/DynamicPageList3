@@ -6,7 +6,6 @@ use MediaWiki\Extension\DynamicPageList3\Maintenance\CreateTemplate;
 use MediaWiki\Extension\DynamicPageList3\Maintenance\CreateView;
 use MediaWiki\Installer\DatabaseUpdater;
 use MediaWiki\Parser\Parser;
-use MediaWiki\Parser\ParserOutputLinkTypes;
 use MediaWiki\Parser\PPFrame;
 use MediaWiki\Registration\ExtensionRegistry;
 
@@ -219,14 +218,15 @@ class Hooks {
 
 		// we can remove the templates by save/restore
 		if ( $reset['templates'] ?? false ) {
-			$saveTemplates = $parserOutput->getLinkList( ParserOutputLinkTypes::TEMPLATE );
+			$saveTemplates = $parserOutput->mTemplates;
 		}
 
 		// we can remove the categories by save/restore
 		if ( $reset['categories'] ?? false ) {
 			$saveCategories = array_combine(
 				$parserOutput->getCategoryNames(),
-				array_map( static fn ( $value ) => $parserOutput->getCategorySortKey( $value ),
+				array_map( static fn ( $value ) =>
+				$parserOutput->getCategorySortKey( $value ),
 					$parserOutput->getCategoryNames()
 				)
 			);
@@ -234,7 +234,7 @@ class Hooks {
 
 		// we can remove the images by save/restore
 		if ( $reset['images'] ?? false ) {
-			$saveImages = $parserOutput->getLinkList( ParserOutputLinkTypes::MEDIA );
+			$saveImages = $parserOutput->mImages;
 		}
 
 		$parsedDPL = $parser->recursiveTagParse( $text );
@@ -619,39 +619,37 @@ class Hooks {
 		// called during the final output phase; removes links created by DPL
 		if ( self::$createdLinks ) {
 			if ( array_key_exists( 0, self::$createdLinks ) ) {
-				$parserLinks = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::LOCAL );
-				foreach ( $parserLinks as $nsp => $link ) {
+				$parserLinks = $parser->getOutput()->mLinks;
+				foreach ( $parserLinks as $nsp => $_ ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[0] ) ) {
 						continue;
 					}
 
-					$mLinks = $parser->getOutput()->GetLinks();
-					$mLinks[$nsp] = array_diff_assoc(
-						$link,
+					$parser->getOutput()->mLinks[$nsp] = array_diff_assoc(
+						$parserLinks[$nsp],
 						self::$createdLinks[0][$nsp]
 					);
 
-					if ( count( $link ) == 0 ) {
-						unset( $mLinks[$nsp] );
+					if ( count( $parserLinks[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mLinks[$nsp] );
 					}
 				}
 			}
 
 			if ( array_key_exists( 1, self::$createdLinks ) ) {
-				$parserTemplates = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::TEMPLATE );
-				foreach ( $parserTemplates as $nsp => $tpl ) {
+				$parserTemplates = $parser->getOutput()->mTemplates;
+				foreach ( $parserTemplates as $nsp => $_ ) {
 					if ( !array_key_exists( $nsp, self::$createdLinks[1] ) ) {
 						continue;
 					}
 
-					$mTemplates = $parser->getOutput()->getTemplates();
-					$mTemplates[$nsp] = array_diff_assoc(
-						$tpl,
+					$parser->getOutput()->mTemplates[$nsp] = array_diff_assoc(
+						$parserTemplates[$nsp],
 						self::$createdLinks[1][$nsp]
 					);
 
-					if ( count( $tpl ) == 0 ) {
-						unset( $mTemplates[$nsp] );
+					if ( count( $parserTemplates[$nsp] ) == 0 ) {
+						unset( $parser->getOutput()->mTemplates[$nsp] );
 					}
 				}
 			}
@@ -669,8 +667,7 @@ class Hooks {
 			}
 
 			if ( array_key_exists( 3, self::$createdLinks ) ) {
-				$parserMedia = $parser->getOutput()->getLinkList( ParserOutputLinkTypes::MEDIA );
-				$parser->getOutput()->mImages = array_diff_assoc( $parserMedia, self::$createdLinks[3] );
+				$parser->getOutput()->mImages = array_diff_assoc( $parser->getOutput()->mImages, self::$createdLinks[3] );
 			}
 		}
 	}
